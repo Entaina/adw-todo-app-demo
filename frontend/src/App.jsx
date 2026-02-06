@@ -1,0 +1,48 @@
+import { useState, useEffect } from 'react'
+import TaskForm from './components/TaskForm'
+import TaskList from './components/TaskList'
+import { fetchTasks, createTask, updateTask, deleteTask } from './services/api'
+
+function App() {
+  const [tasks, setTasks] = useState([])
+
+  // Cargar tareas al montar el componente
+  useEffect(() => {
+    loadTasks()
+  }, [])
+
+  const loadTasks = async () => {
+    const data = await fetchTasks()
+    setTasks(data)
+  }
+
+  const handleCreateTask = async (title) => {
+    const newTask = await createTask(title)
+    setTasks([...tasks, newTask])
+  }
+
+  const handleToggleTask = async (id) => {
+    const task = tasks.find(t => t.id === id)
+    const updated = await updateTask(id, { completed: !task.completed })
+    setTasks(tasks.map(t => t.id === id ? updated : t))
+  }
+
+  const handleDeleteTask = async (id) => {
+    await deleteTask(id)
+    setTasks(tasks.filter(t => t.id !== id))
+  }
+
+  return (
+    <div className="app">
+      <h1>Todo List</h1>
+      <TaskForm onTaskCreated={handleCreateTask} />
+      <TaskList
+        tasks={tasks}
+        onToggle={handleToggleTask}
+        onDelete={handleDeleteTask}
+      />
+    </div>
+  )
+}
+
+export default App

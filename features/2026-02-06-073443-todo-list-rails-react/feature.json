@@ -1,0 +1,68 @@
+{
+  "version": "1.0",
+  "id": "2026-02-06-073443-todo-list-rails-react",
+  "title": "Todo List - Rails API + React",
+  "description": "Aplicación funcional mínima que sirva como base para practicar desarrollo agéntico. Backend Rails API con modelo Task (CRUD completo) y frontend React con Vite. Incluye tests básicos en ambos lados. Suficiente estructura para trabajar, suficientes 'huecos' para que los labs tengan sentido.",
+  "original_request": "../contexts/sample-app.md",
+  "created_at": "2026-02-06T07:34:43Z",
+  "updated_at": "2026-02-06T16:17:03Z",
+  "status": "completed",
+  "progress": 100,
+  "current_phase": "implementation",
+  "tasks": [
+    {
+      "id": "001",
+      "slug": "backend-base-setup",
+      "title": "Backend Base Setup - Rails API",
+      "status": "completed",
+      "priority": 1,
+      "requisito": "RF-08, RNF-04, RNF-06",
+      "depends_on": []
+    },
+    {
+      "id": "002",
+      "slug": "task-model",
+      "title": "Modelo Task con Validaciones",
+      "status": "completed",
+      "priority": 1,
+      "requisito": "RF-05, RF-06, RF-07, RNF-02",
+      "depends_on": ["001"]
+    },
+    {
+      "id": "003",
+      "slug": "tasks-controller",
+      "title": "Tasks Controller CRUD Completo",
+      "status": "completed",
+      "priority": 1,
+      "requisito": "RF-01, RF-02, RF-03, RF-04, RF-08, RNF-02",
+      "depends_on": ["001", "002"]
+    },
+    {
+      "id": "004",
+      "slug": "database-seeds",
+      "title": "Database Seeds con Datos de Ejemplo",
+      "status": "completed",
+      "priority": 2,
+      "requisito": "RF-11, RNF-05",
+      "depends_on": ["002"]
+    },
+    {
+      "id": "005",
+      "slug": "frontend-base-setup",
+      "title": "Frontend Base Setup - React + Vite",
+      "status": "completed",
+      "priority": 1,
+      "requisito": "RNF-04, RNF-06",
+      "depends_on": ["001"]
+    },
+    {
+      "id": "006",
+      "slug": "react-components",
+      "title": "Componentes React y Servicio API",
+      "status": "completed",
+      "priority": 1,
+      "requisito": "RF-01, RF-02, RF-03, RF-04, RF-09, RF-10, RNF-02, RNF-07",
+      "depends_on": ["003", "005"]
+    }
+  ]
+}
