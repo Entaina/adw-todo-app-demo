@@ -14,7 +14,7 @@ CHORE: $ARGUMENTS - Descripcion del chore a completar
 ## Instrucciones
 
 - Estas escribiendo un plan para resolver un chore. Debe ser sencillo pero exhaustivo y preciso para que no se nos escape nada ni perdamos tiempo con una segunda ronda de cambios.
-- Crea el plan en DIRECTORIO_PLANES. Usa kebab-case descriptivo para el nombre del fichero (ej: `plans/actualizar-dependencias-frontend.md`).
+- Crea el plan en DIRECTORIO_PLANES. Usa kebab-case descriptivo para el nombre del fichero (ej: `DIRECTORIO_PLANES/actualizar-dependencias-frontend.md`).
 - Usa el formato de plan de abajo para crear el plan.
 - Investiga el codebase y elabora un plan para completar CHORE.
 - IMPORTANTE: Reemplaza cada <placeholder> en el `Formato del Plan` con el valor solicitado. Anade todo el detalle necesario para completar CHORE.

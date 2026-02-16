@@ -14,7 +14,7 @@ FEATURE: $ARGUMENTS - Descripcion de la funcionalidad a implementar
 ## Instrucciones
 
 - Estas escribiendo un plan para implementar una nueva funcionalidad que aportara valor a la aplicacion.
-- Crea el plan en DIRECTORIO_PLANES. Usa kebab-case descriptivo para el nombre del fichero (ej: `plans/filtro-todos-por-estado.md`).
+- Crea el plan en DIRECTORIO_PLANES. Usa kebab-case descriptivo para el nombre del fichero (ej: `DIRECTORIO_PLANES/filtro-todos-por-estado.md`).
 - Usa el `Formato del Plan` de abajo para crear el plan.
 - Investiga el codebase para entender los patrones existentes, la arquitectura y las convenciones antes de planificar FEATURE.
 - IMPORTANTE: Reemplaza cada <placeholder> en el `Formato del Plan` con el valor solicitado. Anade todo el detalle necesario para implementar FEATURE con exito.
