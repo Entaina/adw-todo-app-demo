@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
-import { fetchTasks, createTask, updateTask, deleteTask } from './services/api'
+import { fetchTasks, createTask, updateTask, deleteTask, reorderTasks } from './services/api'
 
 function App() {
   const [tasks, setTasks] = useState([])
@@ -32,6 +32,16 @@ function App() {
     setTasks(tasks.filter(t => t.id !== id))
   }
 
+  const handleReorderTasks = async (reorderedTasks) => {
+    const previousTasks = tasks
+    setTasks(reorderedTasks)
+    try {
+      await reorderTasks(reorderedTasks.map(t => t.id))
+    } catch {
+      setTasks(previousTasks)
+    }
+  }
+
   return (
     <div className="app">
       <h1>Todo List</h1>
@@ -40,6 +50,7 @@ function App() {
         tasks={tasks}
         onToggle={handleToggleTask}
         onDelete={handleDeleteTask}
+        onReorder={handleReorderTasks}
       />
     </div>
   )

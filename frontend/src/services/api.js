@@ -36,3 +36,14 @@ export async function deleteTask(id) {
   })
   if (!response.ok) throw new Error('Failed to delete task')
 }
+
+// PATCH /api/tasks/reorder - Reordenar tareas
+export async function reorderTasks(taskIds) {
+  const response = await fetch(`${API_BASE_URL}/tasks/reorder`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ task_ids: taskIds })
+  })
+  if (!response.ok) throw new Error('Failed to reorder tasks')
+  return response.json()
+}

@@ -122,4 +122,58 @@ class Api::TasksControllerTest < ActionDispatch::IntegrationTest
     assert json_response.key?("error")
     assert_equal "Task not found", json_response["error"]
   end
+
+  # Tests para PATCH /api/tasks/reorder
+  test "reorder updates positions correctly" do
+    task1 = create(:task, position: 0)
+    task2 = create(:task, position: 1)
+    task3 = create(:task, position: 2)
+
+    patch reorder_api_tasks_url, params: { task_ids: [task3.id, task1.id, task2.id] }, as: :json
+
+    assert_response :success
+    assert_equal 0, task3.reload.position
+    assert_equal 1, task1.reload.position
+    assert_equal 2, task2.reload.position
+  end
+
+  test "reorder returns 422 when task_ids is missing" do
+    patch reorder_api_tasks_url, params: {}, as: :json
+
+    assert_response :unprocessable_entity
+    json_response = JSON.parse(response.body)
+    assert json_response.key?("errors")
+  end
+
+  test "reorder returns 404 when a task_id does not exist" do
+    patch reorder_api_tasks_url, params: { task_ids: [@task.id, 99999] }, as: :json
+
+    assert_response :not_found
+    json_response = JSON.parse(response.body)
+    assert_equal "Task not found", json_response["error"]
+  end
+
+  test "create assigns next position automatically" do
+    max_position = Task.unscoped.maximum(:position).to_i
+    task_title = Faker::Lorem.sentence(word_count: 3)
+
+    post api_tasks_url, params: { task: { title: task_title } }, as: :json
+
+    assert_response :created
+    json_response = JSON.parse(response.body)
+    assert_equal max_position + 1, json_response["position"]
+  end
+
+  test "index returns tasks ordered by position" do
+    Task.delete_all
+    task_c = create(:task, position: 2)
+    task_a = create(:task, position: 0)
+    task_b = create(:task, position: 1)
+
+    get api_tasks_url, as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_equal [task_a.id, task_b.id, task_c.id], json_response.map { |t| t["id"] }
+  end
 end

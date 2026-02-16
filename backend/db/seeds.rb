@@ -12,11 +12,11 @@
 puts "🌱 Cargando tareas de ejemplo..."
 
 sample_tasks = [
-  { title: "Comprar leche", completed: false },
-  { title: "Llamar al doctor", completed: false },
-  { title: "Enviar reporte mensual", completed: true },
-  { title: "Revisar correos pendientes", completed: false },
-  { title: "Preparar presentación", completed: true }
+  { title: "Comprar leche", completed: false, position: 0 },
+  { title: "Llamar al doctor", completed: false, position: 1 },
+  { title: "Enviar reporte mensual", completed: true, position: 2 },
+  { title: "Revisar correos pendientes", completed: false, position: 3 },
+  { title: "Preparar presentación", completed: true, position: 4 }
 ]
 
 created_count = 0
@@ -25,6 +25,7 @@ existing_count = 0
 sample_tasks.each do |task_attrs|
   task = Task.find_or_create_by!(title: task_attrs[:title]) do |t|
     t.completed = task_attrs[:completed]
+    t.position = task_attrs[:position]
     created_count += 1
   end
 

@@ -7,7 +7,11 @@ Rails.application.routes.draw do
 
   # API namespace for all endpoints
   namespace :api do
-    resources :tasks, only: [:index, :create, :update, :destroy]
+    resources :tasks, only: [:index, :create, :update, :destroy] do
+      collection do
+        patch :reorder
+      end
+    end
   end
 
   # Defines the root path route ("/")
