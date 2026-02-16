@@ -11,7 +11,7 @@ DIRECTORIO_PLANES: plans/ - Directorio donde se guardan los planes
 PLAN: $ARGUMENTS - Ruta al fichero del plan en DIRECTORIO_PLANES (ej: plans/mi-plan.md)
 
 ## Instrucciones
-- Lee PLAN, piensa a fondo sobre PLAN e implementalo.
+- Lee PLAN, THINK HARD sobre PLAN e implementalo.
 - Sigue el orden de las tareas de PLAN de arriba a abajo. No te saltes pasos.
 - No te desvies de PLAN. Si encuentras algo que no esta cubierto, anotalo en el reporte pero no lo implementes.
 

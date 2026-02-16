@@ -18,7 +18,7 @@ CHORE: $ARGUMENTS - Descripcion del chore a completar
 - Usa el formato de plan de abajo para crear el plan.
 - Investiga el codebase y elabora un plan para completar CHORE.
 - IMPORTANTE: Reemplaza cada <placeholder> en el `Formato del Plan` con el valor solicitado. Anade todo el detalle necesario para completar CHORE.
-- Usa tu modelo de razonamiento: PIENSA A FONDO sobre el plan y los pasos para completar CHORE.
+- Usa tu modelo de razonamiento: THINK HARD sobre el plan y los pasos para completar CHORE.
 - Respeta los ficheros solicitados en la seccion `Archivos Relevantes`.
 - Si DIRECTORIO_PLANES no existe, crealo antes de escribir el plan.
 - Comienza tu investigacion leyendo el fichero `README.md`.

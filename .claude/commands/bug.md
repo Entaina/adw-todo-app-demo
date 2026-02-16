@@ -18,7 +18,7 @@ BUG: $ARGUMENTS - Descripcion del bug a resolver
 - Usa el formato de plan de abajo para crear el plan.
 - Investiga el codebase para entender BUG, reproducirlo y elaborar un plan para solucionarlo.
 - IMPORTANTE: Reemplaza cada <placeholder> en el `Formato del Plan` con el valor solicitado. Anade todo el detalle necesario para corregir BUG.
-- Usa tu modelo de razonamiento: PIENSA A FONDO sobre BUG, su causa raiz y los pasos para solucionarlo correctamente.
+- Usa tu modelo de razonamiento: THINK HARD sobre BUG, su causa raiz y los pasos para solucionarlo correctamente.
 - IMPORTANTE: Se quirurgico con la correccion del bug, resuelve el bug en cuestion y no te desvies.
 - IMPORTANTE: Queremos el minimo numero de cambios que corrijan y resuelvan el bug.
 - No uses decoradores. Mantenlo simple.
