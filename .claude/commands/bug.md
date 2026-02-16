@@ -14,7 +14,7 @@ BUG: $ARGUMENTS - Descripcion del bug a resolver
 ## Instrucciones
 
 - Estas escribiendo un plan para resolver un bug. Debe ser exhaustivo y preciso para que arreglemos la causa raiz y evitemos regresiones.
-- Crea el plan en DIRECTORIO_PLANES. Usa kebab-case descriptivo para el nombre del fichero (ej: `plans/fix-todo-delete.md`).
+- Crea el plan en DIRECTORIO_PLANES. Usa kebab-case descriptivo para el nombre del fichero (ej: `DIRECTORIO_PLANES/fix-todo-delete.md`).
 - Usa el formato de plan de abajo para crear el plan.
 - Investiga el codebase para entender BUG, reproducirlo y elaborar un plan para solucionarlo.
 - IMPORTANTE: Reemplaza cada <placeholder> en el `Formato del Plan` con el valor solicitado. Anade todo el detalle necesario para corregir BUG.
