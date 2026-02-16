@@ -18,7 +18,7 @@ FEATURE: $ARGUMENTS - Descripcion de la funcionalidad a implementar
 - Usa el `Formato del Plan` de abajo para crear el plan.
 - Investiga el codebase para entender los patrones existentes, la arquitectura y las convenciones antes de planificar FEATURE.
 - IMPORTANTE: Reemplaza cada <placeholder> en el `Formato del Plan` con el valor solicitado. Anade todo el detalle necesario para implementar FEATURE con exito.
-- Usa tu modelo de razonamiento: PIENSA A FONDO sobre los requisitos de FEATURE, el diseño y el enfoque de implementacion.
+- Usa tu modelo de razonamiento: THINK HARD sobre los requisitos de FEATURE, el diseño y el enfoque de implementacion.
 - Sigue los patrones y convenciones existentes en el codebase. No reinventes la rueda.
 - Diseña para extensibilidad y mantenibilidad.
 - Si necesitas una nueva gema Ruby, usa `bundle add` y asegurate de reportarlo en la seccion `Notas` del `Formato del Plan`.
