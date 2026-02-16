@@ -1,6 +1,11 @@
 require "test_helper"
 
 class Api::TasksControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @task = create(:task)
+    @completed_task = create(:task, :completed)
+  end
+
   # Test para GET /api/tasks (index)
   test "should get index with all tasks" do
     get api_tasks_url, as: :json
@@ -8,7 +13,7 @@ class Api::TasksControllerTest < ActionDispatch::IntegrationTest
 
     json_response = JSON.parse(response.body)
     assert_instance_of Array, json_response
-    assert_equal 3, json_response.length
+    assert_equal Task.count, json_response.length
 
     # Verificar estructura de cada tarea
     json_response.each do |task|
@@ -22,13 +27,15 @@ class Api::TasksControllerTest < ActionDispatch::IntegrationTest
 
   # Test para POST /api/tasks (create) exitoso
   test "should create task with valid data" do
+    task_title = Faker::Lorem.sentence(word_count: 3)
+
     assert_difference("Task.count", 1) do
-      post api_tasks_url, params: { task: { title: "New task from test" } }, as: :json
+      post api_tasks_url, params: { task: { title: task_title } }, as: :json
     end
 
     assert_response :created
     json_response = JSON.parse(response.body)
-    assert_equal "New task from test", json_response["title"]
+    assert_equal task_title, json_response["title"]
     assert_equal false, json_response["completed"]
   end
 
@@ -60,40 +67,36 @@ class Api::TasksControllerTest < ActionDispatch::IntegrationTest
 
   # Test para PATCH /api/tasks/:id (update) exitoso
   test "should update task with valid data" do
-    task = tasks(:one)
-    patch api_task_url(task), params: { task: { completed: true } }, as: :json
+    patch api_task_url(@task), params: { task: { completed: true } }, as: :json
 
     assert_response :success
     json_response = JSON.parse(response.body)
     assert_equal true, json_response["completed"]
 
     # Verificar que se actualizó en la base de datos
-    task.reload
-    assert task.completed
+    @task.reload
+    assert @task.completed
   end
 
   # Test para PATCH /api/tasks/:id con datos inválidos
   test "should not update task with invalid data" do
-    task = tasks(:one)
-    original_title = task.title
+    original_title = @task.title
 
-    patch api_task_url(task), params: { task: { title: "" } }, as: :json
+    patch api_task_url(@task), params: { task: { title: "" } }, as: :json
 
     assert_response :unprocessable_entity
     json_response = JSON.parse(response.body)
     assert json_response.key?("errors")
 
     # Verificar que NO se actualizó en la base de datos
-    task.reload
-    assert_equal original_title, task.title
+    @task.reload
+    assert_equal original_title, @task.title
   end
 
   # Test para DELETE /api/tasks/:id (destroy) exitoso
   test "should destroy task" do
-    task = tasks(:one)
-
     assert_difference("Task.count", -1) do
-      delete api_task_url(task), as: :json
+      delete api_task_url(@task), as: :json
     end
 
     assert_response :no_content
