@@ -31,10 +31,9 @@ A sample todo list application built with a **Ruby on Rails** API backend and a 
 ### Backend
 
 ```bash
+docker compose up -d
 cd backend
-bundle install
-rails db:create db:migrate db:seed
-rails server
+bin/setup
 ```
 
 The API will be available at `http://localhost:3000`.
