@@ -33,6 +33,10 @@ A sample todo list application built with a **Ruby on Rails** API backend and a 
 ```bash
 docker compose up -d
 cd backend
+<<<<<<< HEAD
+=======
+docker compose up -d
+>>>>>>> 4fb43e6 (docs: update backend setup instructions for Docker workflow)
 bin/setup
 ```
 
