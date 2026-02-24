@@ -24,7 +24,7 @@ function App() {
   const handleToggleTask = async (id) => {
     const task = tasks.find(t => t.id === id)
     setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t))
-    await updateTask(id, { completed: task.completed })
+    await updateTask(id, { completed: !task.completed })
   }
 
   const handleDeleteTask = async (id) => {
