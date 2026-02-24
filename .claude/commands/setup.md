@@ -12,23 +12,27 @@ Installs all dependencies and sets up the development environment for the full-s
 
 ## Instructions
 
-- Use `backend/docker-compose.yml` for database services (run `docker compose up -d` from the `backend/` directory)
-- If Docker is not running or docker-compose fails, inform the user and stop — the database is required
-- If any step fails, stop and report the error clearly — do not continue with subsequent steps
-- Use `bin/setup --skip-server` for backend setup — it handles bundle install, db:prepare, and cleanup
 - Do NOT start application servers — this command only sets up the environment
 
 ## Workflow
 
-1. Start Docker services:
-   - Run `docker compose up -d` from the `backend/` directory
-   - Verify containers are running
+1. Start infrastructure services:
+   - Read and execute the `/infra:up` command
+   <if fails>
+   Inform the user and stop — the database is required. Do not continue with subsequent steps.
+   </if>
 
 2. Set up the backend:
    - Run `bin/setup --skip-server` in the `backend/` directory
    - This handles: dependency install, database preparation, log/temp cleanup
+   <if fails>
+   Stop and report the error clearly. Do not continue with subsequent steps.
+   </if>
 
 3. Install frontend dependencies:
    - Run `npm install` in the `frontend/` directory
+   <if fails>
+   Stop and report the error clearly. Do not continue with subsequent steps.
+   </if>
 
 4. Report success with a summary of what was set up
