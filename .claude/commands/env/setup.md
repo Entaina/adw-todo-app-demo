@@ -1,7 +1,7 @@
 ---
 description: Install all dependencies and set up the development environment for the full-stack todo app (Rails API + React frontend)
 disable-model-invocation: true
-allowed-tools: Bash, Read
+allowed-tools: Bash, Read, Skill
 ---
 
 # Install and Set Up Project

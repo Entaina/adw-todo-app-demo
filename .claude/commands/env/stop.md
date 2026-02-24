@@ -1,6 +1,6 @@
 ---
 description: Stop the full application (backend, frontend, and optionally infrastructure)
-allowed-tools: Bash, Read
+allowed-tools: Bash, Read, Skill
 ---
 
 # Detener la Aplicación

@@ -1,6 +1,6 @@
 ---
 description: Start the full development environment (infrastructure, backend, frontend)
-allowed-tools: Bash, Read
+allowed-tools: Bash, Read, Skill
 ---
 
 # Inicia el Proyecto
@@ -16,7 +16,7 @@ Arranca todos los servicios necesarios para el entorno de desarrollo: infraestru
 
 ## Workflow
 
-1. Ejecutar el comando `/setup` para instalar dependencias y preparar el entorno
+1. Ejecutar el comando `/env:setup` para instalar dependencias y preparar el entorno
    <if fails>
    Detenerse e informar al usuario. No continuar con los pasos siguientes.
    </if>
