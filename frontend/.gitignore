@@ -3,3 +3,8 @@ dist/
 .DS_Store
 *.local
 coverage/
+tmp/*
+!tmp/.keep
+!tmp/pids/
+tmp/pids/*
+!tmp/pids/.keep

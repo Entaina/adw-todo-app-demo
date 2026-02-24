@@ -18,9 +18,9 @@ npm install
 
 ### Desarrollo
 ```bash
-npm run dev
+bin/dev
 ```
-Servidor de desarrollo en http://localhost:5173
+Arranca el servidor de desarrollo y guarda el PID en `tmp/pids/vite.pid` para poder detenerlo después.
 
 ### Build
 ```bash
@@ -49,6 +49,8 @@ Previsualiza el build de producción
 
 ```
 frontend/
+├── bin/
+│   └── dev              # Script de arranque (gestiona PID)
 ├── src/
 │   ├── components/      # Componentes React
 │   ├── services/        # Servicios API
@@ -56,6 +58,8 @@ frontend/
 │   ├── App.jsx          # Componente raíz
 │   ├── main.jsx         # Punto de entrada
 │   └── index.css        # Estilos globales
+├── tmp/
+│   └── pids/            # PID files de servidores
 ├── index.html           # HTML raíz
 ├── vite.config.js       # Configuración Vite + Vitest
 └── package.json         # Dependencias y scripts

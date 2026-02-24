@@ -14,10 +14,9 @@ A sample todo list application built with a **Ruby on Rails** API backend and a 
 ## Project Structure
 
 ```
-├── backend/          # Rails API (port 3000)
-├── frontend/         # React + Vite app (port 5173)
-├── features/         # Feature planning & documentation
-└── run-tasks.sh      # Task automation script
+├── .claude/commands/ # Claude Code slash commands
+├── backend/          # Rails API
+└── frontend/         # React + Vite app
 ```
 
 ## Prerequisites
@@ -29,64 +28,7 @@ A sample todo list application built with a **Ruby on Rails** API backend and a 
 
 ## Getting Started
 
-### Backend
+See each project's README for setup, development, and testing instructions:
 
-```bash
-cd backend
-docker compose up -d
-bin/setup
-```
-
-The API will be available at `http://localhost:3000`.
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The app will be available at `http://localhost:5173`.
-
-## API Endpoints
-
-| Method | Endpoint           | Description          |
-|--------|--------------------|----------------------|
-| GET    | `/api/tasks`       | List all tasks       |
-| POST   | `/api/tasks`       | Create a task        |
-| PATCH  | `/api/tasks/:id`   | Update a task        |
-| DELETE | `/api/tasks/:id`   | Delete a task        |
-
-## Running Tests
-
-```bash
-# Backend
-cd backend
-rails test
-
-# Frontend
-cd frontend
-npm run test
-```
-
-## Data Model
-
-**Task**
-
-| Field       | Type     | Constraints                      |
-|-------------|----------|----------------------------------|
-| title       | string   | Required, max 200 characters     |
-| completed   | boolean  | Default: `false`                 |
-| created_at  | datetime | Auto-generated                   |
-| updated_at  | datetime | Auto-generated                   |
-
-## Seed Data
-
-The backend includes sample tasks for development:
-
-- Comprar leche
-- Llamar al doctor
-- Enviar reporte mensual
-- Revisar correos pendientes
-- Preparar presentacion
+- [Backend README](backend/README.md)
+- [Frontend README](frontend/README.md)
