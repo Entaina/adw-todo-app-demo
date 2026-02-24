@@ -1,0 +1,1 @@
+/feature Diálogo de confirmación al borrar una tarea: Añade un dialogo de confirmación cuando se vaya a borrar una tarea
