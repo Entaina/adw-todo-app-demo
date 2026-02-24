@@ -7,18 +7,18 @@ const mockTasks = [
 ]
 
 test('renders all tasks', () => {
-  render(<TaskList tasks={mockTasks} onToggle={() => {}} onDelete={() => {}} />)
+  render(<TaskList tasks={mockTasks} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
   expect(screen.getByText('Task 1')).toBeInTheDocument()
   expect(screen.getByText('Task 2')).toBeInTheDocument()
 })
 
 test('shows empty message when no tasks', () => {
-  render(<TaskList tasks={[]} onToggle={() => {}} onDelete={() => {}} />)
+  render(<TaskList tasks={[]} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
   expect(screen.getByText(/no hay tareas/i)).toBeInTheDocument()
 })
 
 test('renders correct number of task items', () => {
-  render(<TaskList tasks={mockTasks} onToggle={() => {}} onDelete={() => {}} />)
+  render(<TaskList tasks={mockTasks} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
   const checkboxes = screen.getAllByRole('checkbox')
   expect(checkboxes).toHaveLength(2)
 })
