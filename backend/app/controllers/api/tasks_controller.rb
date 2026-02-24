@@ -36,10 +36,27 @@ class Api::TasksController < ApplicationController
     head :no_content
   end
 
+  # PATCH /api/tasks/reorder
+  def reorder
+    task_ids = params[:task_ids]
+
+    if task_ids.blank? || !task_ids.is_a?(Array)
+      return render json: { error: "task_ids must be a non-empty array" }, status: :unprocessable_entity
+    end
+
+    ActiveRecord::Base.transaction do
+      task_ids.each_with_index do |id, index|
+        Task.unscoped.where(id: id).update_all(position: index)
+      end
+    end
+
+    render json: Task.all, status: :ok
+  end
+
   private
 
   def task_params
-    params.require(:task).permit(:title, :completed)
+    params.require(:task).permit(:title, :completed, :position)
   end
 
   def record_not_found

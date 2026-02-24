@@ -7,7 +7,8 @@ vi.mock('../services/api', () => ({
   fetchTasks: vi.fn().mockResolvedValue([]),
   createTask: vi.fn(),
   updateTask: vi.fn().mockResolvedValue({}),
-  deleteTask: vi.fn()
+  deleteTask: vi.fn(),
+  reorderTasks: vi.fn().mockResolvedValue([])
 }))
 
 test('renders Todo List heading', () => {

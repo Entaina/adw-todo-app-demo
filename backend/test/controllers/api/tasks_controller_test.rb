@@ -119,4 +119,34 @@ class Api::TasksControllerTest < ActionDispatch::IntegrationTest
     assert json_response.key?("error")
     assert_equal "Task not found", json_response["error"]
   end
+
+  # Test para PATCH /api/tasks/reorder
+  test "should reorder tasks" do
+    task_one = tasks(:one)
+    task_two = tasks(:two)
+    task_three = tasks(:three)
+
+    new_order = [task_three.id, task_one.id, task_two.id]
+    patch reorder_api_tasks_url, params: { task_ids: new_order }, as: :json
+
+    assert_response :ok
+
+    assert_equal 0, task_three.reload.position
+    assert_equal 1, task_one.reload.position
+    assert_equal 2, task_two.reload.position
+  end
+
+  test "should return error when task_ids is empty" do
+    patch reorder_api_tasks_url, params: { task_ids: [] }, as: :json
+    assert_response :unprocessable_entity
+  end
+
+  test "index returns tasks ordered by position" do
+    get api_tasks_url, as: :json
+    assert_response :success
+
+    json_response = JSON.parse(response.body)
+    positions = json_response.map { |t| t["position"] }
+    assert_equal positions.sort, positions
+  end
 end
