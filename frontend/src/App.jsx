@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
+import ConfirmDialog from './components/ConfirmDialog'
 import { fetchTasks, createTask, updateTask, deleteTask, reorderTasks } from './services/api'
 
 function App() {
   const [tasks, setTasks] = useState([])
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+  const [taskToDelete, setTaskToDelete] = useState(null)
 
   // Cargar tareas al montar el componente
   useEffect(() => {
@@ -27,9 +30,23 @@ function App() {
     await updateTask(id, { completed: !task.completed })
   }
 
-  const handleDeleteTask = async (id) => {
-    await deleteTask(id)
-    setTasks(tasks.filter(t => t.id !== id))
+  const handleDeleteTask = (id) => {
+    setTaskToDelete(id)
+    setConfirmDialogOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (taskToDelete !== null) {
+      await deleteTask(taskToDelete)
+      setTasks(tasks.filter(t => t.id !== taskToDelete))
+    }
+    setConfirmDialogOpen(false)
+    setTaskToDelete(null)
+  }
+
+  const handleCancelDelete = () => {
+    setConfirmDialogOpen(false)
+    setTaskToDelete(null)
   }
 
   const handleReorderTasks = async (taskIds) => {
@@ -37,6 +54,8 @@ function App() {
     setTasks(reordered)
     await reorderTasks(taskIds)
   }
+
+  const taskToDeleteTitle = taskToDelete ? tasks.find(t => t.id === taskToDelete)?.title : ''
 
   return (
     <div className="app">
@@ -47,6 +66,15 @@ function App() {
         onToggle={handleToggleTask}
         onDelete={handleDeleteTask}
         onReorder={handleReorderTasks}
+      />
+      <ConfirmDialog
+        isOpen={confirmDialogOpen}
+        title="Confirmar eliminación"
+        message={`¿Estás seguro de que quieres eliminar la tarea "${taskToDeleteTitle}"?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
       />
     </div>
   )
