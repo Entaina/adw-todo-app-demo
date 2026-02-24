@@ -8,7 +8,7 @@ A sample todo list application built with a **Ruby on Rails** API backend and a 
 |----------|-----------------------------|
 | Backend  | Ruby on Rails 8.1 (API mode) |
 | Frontend | React 18 + Vite 6            |
-| Database | SQLite3                       |
+| Database | PostgreSQL 16                 |
 | Testing  | Minitest (backend), Vitest + React Testing Library (frontend) |
 
 ## Project Structure
@@ -25,14 +25,15 @@ A sample todo list application built with a **Ruby on Rails** API backend and a 
 - Ruby 3.3.1
 - Node.js 18+
 - Bundler
+- Docker
 
 ## Getting Started
 
 ### Backend
 
 ```bash
-docker compose up -d
 cd backend
+docker compose up -d
 bin/setup
 ```
 

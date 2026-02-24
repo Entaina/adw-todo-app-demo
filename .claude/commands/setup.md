@@ -12,7 +12,7 @@ Installs all dependencies and sets up the development environment for the full-s
 
 ## Instructions
 
-- Use the root `docker-compose.yml` for database services, not `backend/docker-compose.yml`
+- Use `backend/docker-compose.yml` for database services (run `docker compose up -d` from the `backend/` directory)
 - If Docker is not running or docker-compose fails, inform the user and stop — the database is required
 - If any step fails, stop and report the error clearly — do not continue with subsequent steps
 - Use `bin/setup --skip-server` for backend setup — it handles bundle install, db:prepare, and cleanup
@@ -21,7 +21,7 @@ Installs all dependencies and sets up the development environment for the full-s
 ## Workflow
 
 1. Start Docker services:
-   - Run `docker compose up -d` from the project root
+   - Run `docker compose up -d` from the `backend/` directory
    - Verify containers are running
 
 2. Set up the backend:
