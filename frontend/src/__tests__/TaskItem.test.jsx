@@ -1,6 +1,25 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import TaskItem from '../components/TaskItem'
 
+vi.mock('@dnd-kit/sortable', () => ({
+  useSortable: () => ({
+    attributes: {},
+    listeners: {},
+    setNodeRef: () => {},
+    transform: null,
+    transition: null,
+    isDragging: false
+  })
+}))
+
+vi.mock('@dnd-kit/utilities', () => ({
+  CSS: {
+    Transform: {
+      toString: () => undefined
+    }
+  }
+}))
+
 const mockTask = {
   id: 1,
   title: 'Test task',
@@ -34,4 +53,10 @@ test('calls onDelete when delete button is clicked', () => {
 
   fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
   expect(mockDelete).toHaveBeenCalledWith(1)
+})
+
+test('renders drag handle', () => {
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={() => {}} />)
+  const handle = document.querySelector('.drag-handle')
+  expect(handle).toBeInTheDocument()
 })

@@ -1,0 +1,191 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+#
+# Cron-based ADW trigger system that monitors GitHub issues and automatically processes them.
+#
+# This script polls GitHub every 20 seconds to detect:
+# 1. New issues without comments
+# 2. Issues where the latest comment contains 'adw'
+#
+# When a qualifying issue is found, it triggers the existing manual workflow script.
+#
+# Usage: ./trigger_cron
+#
+
+require "bundler/setup"
+require "dotenv/load"
+require "rufus-scheduler"
+require "set"
+require_relative "../lib/adw"
+
+# Get repository URL from git remote
+begin
+  GITHUB_REPO_URL = Adw::GitHub.repo_url
+  REPO_PATH = Adw::GitHub.extract_repo_path(GITHUB_REPO_URL)
+rescue => e
+  warn "ERROR: #{e}"
+  exit 1
+end
+
+# Track processed issues
+processed_issues = Set.new
+# Track issues with their last processed comment ID
+issue_last_comment = {}
+
+# Graceful shutdown flag
+shutdown_requested = false
+
+Signal.trap("INT") do
+  puts "\nINFO: Received SIGINT, initiating graceful shutdown..."
+  shutdown_requested = true
+end
+
+Signal.trap("TERM") do
+  puts "\nINFO: Received SIGTERM, initiating graceful shutdown..."
+  shutdown_requested = true
+end
+
+def should_process_issue?(issue_number, issue_last_comment)
+  comments = Adw::GitHub.fetch_issue_comments(REPO_PATH, issue_number)
+
+  # If no comments, it's a new issue - process it
+  if comments.empty?
+    puts "INFO: Issue ##{issue_number} has no comments - marking for processing"
+    return true
+  end
+
+  # Get the latest comment
+  latest_comment = comments.last
+  comment_body = latest_comment.fetch("body", "").downcase.strip
+  comment_id = latest_comment.fetch("id", nil)
+
+  # Check if we've already processed this comment
+  last_processed = issue_last_comment[issue_number]
+  return false if last_processed == comment_id
+
+  # Check if latest comment is exactly 'adw'
+  if comment_body == "adw"
+    puts "INFO: Issue ##{issue_number} - latest comment is 'adw' - marking for processing"
+    issue_last_comment[issue_number] = comment_id
+    return true
+  end
+
+  false
+end
+
+def trigger_workflow(issue_number)
+  script_path = File.join(__dir__, "adw_plan_build")
+
+  puts "INFO: Triggering ADW workflow for issue ##{issue_number}"
+
+  pid = Process.spawn(
+    RbConfig.ruby, script_path, issue_number.to_s,
+    out: $stdout,
+    err: $stderr
+  )
+  Process.detach(pid)
+
+  puts "INFO: Successfully triggered workflow for issue ##{issue_number} (PID: #{pid})"
+  true
+rescue => e
+  warn "ERROR: Exception while triggering workflow for issue ##{issue_number}: #{e}"
+  false
+end
+
+def check_and_process_issues(processed_issues, issue_last_comment, shutdown_requested)
+  return if shutdown_requested
+
+  start_time = Time.now
+  puts "INFO: Starting issue check cycle"
+
+  begin
+    # Fetch all open issues
+    issues = Adw::GitHub.fetch_open_issues(REPO_PATH)
+
+    if issues.empty?
+      puts "INFO: No open issues found"
+      return
+    end
+
+    # Track newly qualified issues
+    new_qualifying_issues = []
+
+    # Check each issue
+    issues.each do |issue|
+      issue_number = issue.number
+      next unless issue_number
+      next if processed_issues.include?(issue_number)
+
+      if should_process_issue?(issue_number, issue_last_comment)
+        new_qualifying_issues << issue_number
+      end
+    end
+
+    # Process qualifying issues
+    if new_qualifying_issues.any?
+      puts "INFO: Found #{new_qualifying_issues.length} new qualifying issues: #{new_qualifying_issues}"
+
+      new_qualifying_issues.each do |issue_number|
+        break if shutdown_requested
+
+        if trigger_workflow(issue_number)
+          processed_issues.add(issue_number)
+        else
+          puts "WARNING: Failed to process issue ##{issue_number}, will retry in next cycle"
+        end
+      end
+    else
+      puts "INFO: No new qualifying issues found"
+    end
+
+    cycle_time = Time.now - start_time
+    puts "INFO: Check cycle completed in #{cycle_time.round(2)} seconds"
+    puts "INFO: Total processed issues in session: #{processed_issues.length}"
+  rescue => e
+    warn "ERROR: Error during check cycle: #{e}"
+    warn e.backtrace.join("\n")
+  end
+end
+
+# Main entry point
+if ARGV.include?("--help") || ARGV.include?("-h")
+  puts <<~HELP
+    Cron-based ADW trigger system that monitors GitHub issues and automatically processes them.
+
+    Usage: ./trigger_cron
+
+    Environment variables:
+      GITHUB_PAT - (Optional) GitHub Personal Access Token
+
+    The script will poll GitHub issues every 20 seconds and trigger
+    the ADW workflow for qualifying issues.
+
+    Note: Repository URL is automatically detected from git remote.
+  HELP
+  exit 0
+end
+
+puts "INFO: Starting ADW cron trigger"
+puts "INFO: Repository: #{REPO_PATH}"
+puts "INFO: Polling interval: 20 seconds"
+
+scheduler = Rufus::Scheduler.new
+
+scheduler.every "20s" do
+  check_and_process_issues(processed_issues, issue_last_comment, shutdown_requested)
+end
+
+# Run initial check immediately
+check_and_process_issues(processed_issues, issue_last_comment, shutdown_requested)
+
+# Main loop
+puts "INFO: Entering main scheduling loop"
+loop do
+  break if shutdown_requested
+
+  sleep 1
+end
+
+scheduler.shutdown
+puts "INFO: Shutdown complete"
