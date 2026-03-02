@@ -28,7 +28,9 @@ module Adw
       end
 
       def extract_repo_path(url)
-        url.sub("https://github.com/", "").sub(/\.git\z/, "")
+        url.sub(%r{\Ahttps://github\.com/}, "")
+           .sub(%r{\Agit@github\.com:}, "")
+           .sub(/\.git\z/, "")
       end
 
       def fetch_issue(issue_number, repo_path)
@@ -63,11 +65,12 @@ module Adw
         cmd = [
           "gh", "api",
           "repos/#{repo_path}/issues/#{issue_number}/comments",
-          "-f", "body=#{body}"
+          "--input", "-"
         ]
 
         env = github_env
-        stdout, stderr, status = Open3.capture3(*([env, *cmd].compact))
+        payload = JSON.generate({ body: body })
+        stdout, stderr, status = Open3.capture3(*([env, *cmd].compact), stdin_data: payload)
 
         unless status.success?
           warn "Error creating comment: #{stderr}"
@@ -85,11 +88,12 @@ module Adw
           "gh", "api",
           "repos/#{repo_path}/issues/comments/#{comment_id}",
           "--method", "PATCH",
-          "-f", "body=#{body}"
+          "--input", "-"
         ]
 
         env = github_env
-        _stdout, stderr, status = Open3.capture3(*([env, *cmd].compact))
+        payload = JSON.generate({ body: body })
+        _stdout, stderr, status = Open3.capture3(*([env, *cmd].compact), stdin_data: payload)
 
         unless status.success?
           warn "Error updating comment #{comment_id}: #{stderr}"
@@ -101,24 +105,47 @@ module Adw
 
       def transition_label(issue_number, new_label, old_label = nil)
         repo_path = extract_repo_path(repo_url)
+        env = github_env
 
-        cmd = [
+        # Remove old label first (ignore failure if label doesn't exist)
+        if old_label
+          remove_cmd = [
+            "gh", "issue", "edit", issue_number.to_s,
+            "-R", repo_path,
+            "--remove-label", old_label
+          ]
+          Open3.capture3(*([env, *remove_cmd].compact))
+        end
+
+        # Ensure the new label exists in the repo
+        ensure_label_exists(repo_path, new_label)
+
+        # Add new label
+        add_cmd = [
           "gh", "issue", "edit", issue_number.to_s,
           "-R", repo_path,
           "--add-label", new_label
         ]
 
-        cmd.push("--remove-label", old_label) if old_label
-
-        env = github_env
-        _stdout, stderr, status = Open3.capture3(*([env, *cmd].compact))
+        _stdout, stderr, status = Open3.capture3(*([env, *add_cmd].compact))
 
         unless status.success?
-          warn "Warning: Could not transition label to '#{new_label}': #{stderr}"
+          warn "Warning: Could not add label '#{new_label}': #{stderr}"
         end
 
         status.success?
       end
+
+      private
+
+      def ensure_label_exists(repo_path, label)
+        color = Adw::Tracker::LABEL_COLORS.fetch(label, "EDEDED")
+        cmd = ["gh", "label", "create", label, "--color", color, "--repo", repo_path, "--force"]
+        env = github_env
+        Open3.capture3(*([env, *cmd].compact))
+      end
+
+      public
 
       def fetch_open_issues(repo_path)
         cmd = [

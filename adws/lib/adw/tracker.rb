@@ -17,6 +17,16 @@ module Adw
 
     STATUSES = STATUS_EMOJIS.keys.freeze
 
+    LABEL_COLORS = {
+      "adw/classifying"  => "C2E0C6",
+      "adw/planning"     => "BFD4F2",
+      "adw/implementing" => "FEF2C0",
+      "adw/committing"   => "D4C5F9",
+      "adw/creating_pr"  => "BFDADC",
+      "adw/done"         => "0E8A16",
+      "adw/error"        => "E11D48"
+    }.freeze
+
     class << self
       def render_comment(tracker)
         emoji = STATUS_EMOJIS.fetch(tracker[:status], "❓")
