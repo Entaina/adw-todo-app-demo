@@ -15,6 +15,10 @@ function TaskList({ tasks, onToggle, onDelete, onReorder }) {
     return <p className="empty-message">No hay tareas. ¡Crea una nueva!</p>
   }
 
+  // Separar tareas en pendientes y completadas
+  const pendingTasks = tasks.filter(task => !task.completed)
+  const completedTasks = tasks.filter(task => task.completed)
+
   const handleDragEnd = (event) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
@@ -26,20 +30,41 @@ function TaskList({ tasks, onToggle, onDelete, onReorder }) {
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-        <div className="task-list">
-          {tasks.map(task => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              onToggle={onToggle}
-              onDelete={onDelete}
-            />
-          ))}
-        </div>
-      </SortableContext>
-    </DndContext>
+    <div>
+      {/* Sección de tareas pendientes con drag-and-drop */}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={pendingTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+          <div className="task-list">
+            {pendingTasks.map(task => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onToggle={onToggle}
+                onDelete={onDelete}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+
+      {/* Separador y sección de tareas completadas */}
+      {completedTasks.length > 0 && (
+        <>
+          <div className="completed-section-separator">Completadas</div>
+          <div className="completed-tasks-section task-list">
+            {completedTasks.map(task => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onToggle={onToggle}
+                onDelete={onDelete}
+                isInCompletedSection={true}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
   )
 }
 

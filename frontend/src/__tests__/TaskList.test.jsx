@@ -22,3 +22,48 @@ test('renders correct number of task items', () => {
   const checkboxes = screen.getAllByRole('checkbox')
   expect(checkboxes).toHaveLength(2)
 })
+
+test('renders separator when there are completed tasks', () => {
+  const tasksWithCompleted = [
+    { id: 1, title: 'Pending Task', completed: false },
+    { id: 2, title: 'Completed Task', completed: true }
+  ]
+  render(<TaskList tasks={tasksWithCompleted} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+  expect(screen.getByText('Completadas')).toBeInTheDocument()
+})
+
+test('does not render separator when no completed tasks', () => {
+  const pendingTasksOnly = [
+    { id: 1, title: 'Pending Task 1', completed: false },
+    { id: 2, title: 'Pending Task 2', completed: false }
+  ]
+  render(<TaskList tasks={pendingTasksOnly} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+  expect(screen.queryByText('Completadas')).not.toBeInTheDocument()
+})
+
+test('renders pending tasks before completed tasks', () => {
+  const mixedTasks = [
+    { id: 1, title: 'Completed Task', completed: true },
+    { id: 2, title: 'Pending Task', completed: false },
+    { id: 3, title: 'Another Completed', completed: true }
+  ]
+  render(<TaskList tasks={mixedTasks} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+
+  const allTaskText = screen.getAllByText(/Task|Completed/)
+  const pendingIndex = allTaskText.findIndex(el => el.textContent.includes('Pending Task'))
+  const completedIndex = allTaskText.findIndex(el => el.textContent.includes('Completed Task'))
+
+  expect(pendingIndex).toBeLessThan(completedIndex)
+})
+
+test('completed section has correct styling class', () => {
+  const tasksWithCompleted = [
+    { id: 1, title: 'Pending Task', completed: false },
+    { id: 2, title: 'Completed Task', completed: true }
+  ]
+  const { container } = render(<TaskList tasks={tasksWithCompleted} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+
+  const completedSection = container.querySelector('.completed-tasks-section')
+  expect(completedSection).toBeInTheDocument()
+  expect(completedSection).toHaveClass('task-list')
+})

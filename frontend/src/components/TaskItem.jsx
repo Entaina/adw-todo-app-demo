@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-function TaskItem({ task, onToggle, onDelete }) {
+function TaskItem({ task, onToggle, onDelete, isInCompletedSection = false }) {
   const {
     attributes,
     listeners,
@@ -9,21 +9,32 @@ function TaskItem({ task, onToggle, onDelete }) {
     transform,
     transition,
     isDragging
-  } = useSortable({ id: task.id })
+  } = useSortable({ id: task.id, disabled: isInCompletedSection })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition
   }
 
+  const classNames = [
+    'task-item',
+    isDragging && 'dragging',
+    isInCompletedSection && 'in-completed-section'
+  ].filter(Boolean).join(' ')
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`task-item${isDragging ? ' dragging' : ''}`}
+      className={classNames}
       {...attributes}
     >
-      <span className="drag-handle" {...listeners}>⠿</span>
+      <span
+        className="drag-handle"
+        {...(!isInCompletedSection ? listeners : {})}
+      >
+        ⠿
+      </span>
       <input
         type="checkbox"
         checked={task.completed}

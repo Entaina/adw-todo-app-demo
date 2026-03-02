@@ -148,3 +148,44 @@ p {
   text-decoration: line-through;
   color: #999;
 }
+
+/* Completed Section Separator */
+.completed-section-separator {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0 1rem;
+  color: #999;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.completed-section-separator::before,
+.completed-section-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.completed-section-separator::before {
+  margin-right: 0.75rem;
+}
+
+.completed-section-separator::after {
+  margin-left: 0.75rem;
+}
+
+/* Completed Tasks Section */
+.completed-tasks-section {
+  opacity: 0.7;
+}
+
+.task-item.in-completed-section {
+  background-color: #fafafa;
+}
+
+.task-item.in-completed-section .drag-handle {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
