@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
+import ConfirmDialog from './components/ConfirmDialog'
 import { fetchTasks, createTask, updateTask, deleteTask, reorderTasks } from './services/api'
 
 function App() {
   const [tasks, setTasks] = useState([])
+  const [deleteConfirmation, setDeleteConfirmation] = useState({
+    isOpen: false,
+    taskId: null,
+    taskTitle: ''
+  })
 
   // Cargar tareas al montar el componente
   useEffect(() => {
@@ -27,9 +33,31 @@ function App() {
     await updateTask(id, { completed: !task.completed })
   }
 
-  const handleDeleteTask = async (id) => {
-    await deleteTask(id)
-    setTasks(tasks.filter(t => t.id !== id))
+  const handleDeleteTask = (id) => {
+    const task = tasks.find(t => t.id === id)
+    setDeleteConfirmation({
+      isOpen: true,
+      taskId: id,
+      taskTitle: task.title
+    })
+  }
+
+  const confirmDelete = async () => {
+    await deleteTask(deleteConfirmation.taskId)
+    setTasks(tasks.filter(t => t.id !== deleteConfirmation.taskId))
+    setDeleteConfirmation({
+      isOpen: false,
+      taskId: null,
+      taskTitle: ''
+    })
+  }
+
+  const cancelDelete = () => {
+    setDeleteConfirmation({
+      isOpen: false,
+      taskId: null,
+      taskTitle: ''
+    })
   }
 
   const handleReorderTasks = async (taskIds) => {
@@ -47,6 +75,13 @@ function App() {
         onToggle={handleToggleTask}
         onDelete={handleDeleteTask}
         onReorder={handleReorderTasks}
+      />
+      <ConfirmDialog
+        isOpen={deleteConfirmation.isOpen}
+        title="Confirmar eliminación"
+        message={`¿Estás seguro de que quieres eliminar la tarea "${deleteConfirmation.taskTitle}"?`}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
       />
     </div>
   )
