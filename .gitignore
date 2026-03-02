@@ -9,3 +9,6 @@
 
 # Claude Code
 .claude/settings.local.json
+
+# ADW local plans
+.issues/

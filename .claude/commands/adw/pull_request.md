@@ -12,8 +12,7 @@ Crea un pull request en Github con el contexto de la issue, el plan y los cambio
 
 BRANCH_NAME: $1 - Nombre de la rama actual
 ISSUE: $2 - JSON de la issue de Github
-PLAN_FILE: $3 - Ruta al fichero del plan de implementacion
-ADW_ID: $4 - Identificador del workflow ADW
+ADW_ID: $3 - Identificador del workflow ADW
 
 ## Instrucciones
 
@@ -32,7 +31,7 @@ ADW_ID: $4 - Identificador del workflow ADW
 Closes #<issue_number>
 
 ## Implementation Plan
-See [plan file](<PLAN_FILE>)
+See implementation plan in issue #<issue_number> comments
 
 ## Changes
 <lista con vinetas de los cambios clave realizados>
