@@ -47,12 +47,59 @@ test('calls onToggle when checkbox is clicked', () => {
   expect(mockToggle).toHaveBeenCalledWith(1)
 })
 
-test('calls onDelete when delete button is clicked', () => {
+test('shows confirmation dialog when delete button is clicked', () => {
   const mockDelete = vi.fn()
   render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
 
+  // Click the delete button
   fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+
+  // Check that the confirmation dialog appears
+  expect(screen.getByText('Eliminar tarea')).toBeInTheDocument()
+  expect(screen.getByText(/¿Estás seguro de que deseas eliminar la tarea "Test task"\?/)).toBeInTheDocument()
+})
+
+test('calls onDelete when deletion is confirmed', () => {
+  const mockDelete = vi.fn()
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
+
+  // Click the delete button to open dialog
+  const deleteButton = screen.getByRole('button', { name: /eliminar/i })
+  fireEvent.click(deleteButton)
+
+  // Click the confirm button in the dialog
+  const confirmButton = screen.getAllByText('Eliminar').find(el => el.className === 'btn-confirm-delete')
+  fireEvent.click(confirmButton)
+
   expect(mockDelete).toHaveBeenCalledWith(1)
+})
+
+test('does not call onDelete when deletion is cancelled', () => {
+  const mockDelete = vi.fn()
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
+
+  // Click the delete button to open dialog
+  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+
+  // Click the cancel button in the dialog
+  fireEvent.click(screen.getByText('Cancelar'))
+
+  expect(mockDelete).not.toHaveBeenCalled()
+})
+
+test('closes dialog when cancelled', () => {
+  const mockDelete = vi.fn()
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
+
+  // Click the delete button to open dialog
+  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+  expect(screen.getByText('Eliminar tarea')).toBeInTheDocument()
+
+  // Click the cancel button
+  fireEvent.click(screen.getByText('Cancelar'))
+
+  // Dialog should be closed
+  expect(screen.queryByText('Eliminar tarea')).not.toBeInTheDocument()
 })
 
 test('renders drag handle', () => {
