@@ -110,17 +110,27 @@ module Adw
           "phase_comments" => (tracker[:phase_comments] || {})
         }
 
-        content = "#{YAML.dump(data)}---\n"
-        File.write(File.join(dir, "tracker.md"), content)
+        File.write(File.join(dir, "tracker.yaml"), YAML.dump(data))
       end
 
       def load(issue_number)
-        path = File.join(tracker_dir(issue_number), "tracker.md")
-        raw = File.read(path)
+        dir = tracker_dir(issue_number)
+        yaml_path = File.join(dir, "tracker.yaml")
+        md_path   = File.join(dir, "tracker.md")
+
+        if File.exist?(yaml_path)
+          raw = File.read(yaml_path)
+        elsif File.exist?(md_path)
+          raw = File.read(md_path)
+          migrate = true
+        else
+          return nil
+        end
+
         data = YAML.safe_load(raw)
         return nil unless data.is_a?(Hash)
 
-        {
+        tracker = {
           comment_id: data["comment_id"],
           adw_id: data["adw_id"],
           classification: data["classification"],
@@ -129,6 +139,13 @@ module Adw
           patches: (data["patches"] || []).map { |p| p.transform_keys(&:to_sym) },
           phase_comments: (data["phase_comments"] || {})
         }
+
+        if migrate
+          save(issue_number, tracker)
+          File.delete(md_path)
+        end
+
+        tracker
       rescue Errno::ENOENT, Psych::SyntaxError
         nil
       end
