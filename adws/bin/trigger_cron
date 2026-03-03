@@ -160,11 +160,12 @@ def check_and_process_issues(processed_issues, issue_last_comment, shutdown_requ
     issues.each do |issue|
       issue_number = issue.number
       next unless issue_number
-      next if processed_issues.include?(issue_number)
 
       adw_labels = issue.labels.select { |l| l.name.start_with?("adw/") }
 
       # Case 1: Issue with adw/done → check for new human comment to trigger patch
+      # NOTE: Must be checked BEFORE processed_issues filter, since the issue may have
+      # been processed in this session (full pipeline) but now needs a patch.
       if adw_labels.any? { |l| l.name == "adw/done" }
         comment_body = check_patch_trigger(issue_number, issue_last_comment)
         if comment_body
@@ -172,6 +173,9 @@ def check_and_process_issues(processed_issues, issue_last_comment, shutdown_requ
         end
         next
       end
+
+      # For full pipeline only: skip issues already processed in this session
+      next if processed_issues.include?(issue_number)
 
       # Case 2: Issue with other adw/ labels (not error) → skip (in progress)
       if adw_labels.any?
