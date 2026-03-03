@@ -149,4 +149,67 @@ class Api::TasksControllerTest < ActionDispatch::IntegrationTest
     positions = json_response.map { |t| t["position"] }
     assert_equal positions.sort, positions
   end
+
+  # Tests para due_at
+  test "should create task with due_at" do
+    due_date = 1.day.from_now
+    assert_difference("Task.count", 1) do
+      post api_tasks_url, params: { task: { title: "Task with deadline", due_at: due_date } }, as: :json
+    end
+
+    assert_response :created
+    json_response = JSON.parse(response.body)
+    assert_equal "Task with deadline", json_response["title"]
+    assert_not_nil json_response["due_at"]
+  end
+
+  test "should create task without due_at" do
+    assert_difference("Task.count", 1) do
+      post api_tasks_url, params: { task: { title: "Task without deadline" } }, as: :json
+    end
+
+    assert_response :created
+    json_response = JSON.parse(response.body)
+    assert_equal "Task without deadline", json_response["title"]
+    assert_nil json_response["due_at"]
+  end
+
+  test "should update task to add due_at" do
+    task = tasks(:one)
+    assert_nil task.due_at
+
+    due_date = 2.days.from_now
+    patch api_task_url(task), params: { task: { due_at: due_date } }, as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_not_nil json_response["due_at"]
+
+    task.reload
+    assert_not_nil task.due_at
+  end
+
+  test "should update task to remove due_at" do
+    task = tasks(:three)
+    assert_not_nil task.due_at
+
+    patch api_task_url(task), params: { task: { due_at: nil } }, as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_nil json_response["due_at"]
+
+    task.reload
+    assert_nil task.due_at
+  end
+
+  test "index includes due_at field" do
+    get api_tasks_url, as: :json
+    assert_response :success
+
+    json_response = JSON.parse(response.body)
+    json_response.each do |task|
+      assert task.key?("due_at")
+    end
+  end
 end

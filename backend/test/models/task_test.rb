@@ -4,6 +4,7 @@
 #
 #  id         :bigint           not null, primary key
 #  completed  :boolean          default(FALSE), not null
+#  due_at     :datetime
 #  position   :integer          default(0), not null
 #  title      :string           not null
 #  created_at :datetime         not null
@@ -59,5 +60,25 @@ class TaskTest < ActiveSupport::TestCase
     tasks = Task.all
     positions = tasks.map(&:position)
     assert_equal positions.sort, positions
+  end
+
+  test "due_at is optional" do
+    task = Task.new(title: "Task without due date")
+    assert task.valid?
+    task.save
+    assert_nil task.due_at
+  end
+
+  test "task can be created with due_at" do
+    due_date = 1.day.from_now
+    task = Task.create!(title: "Task with due date", due_at: due_date)
+    assert_not_nil task.due_at
+    assert_equal due_date.to_i, task.due_at.to_i
+  end
+
+  test "due_at is serialized correctly" do
+    task = tasks(:three)
+    assert_not_nil task.due_at
+    assert_instance_of ActiveSupport::TimeWithZone, task.due_at
   end
 end

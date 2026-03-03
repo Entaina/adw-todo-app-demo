@@ -60,3 +60,50 @@ test('renders drag handle', () => {
   const handle = document.querySelector('.drag-handle')
   expect(handle).toBeInTheDocument()
 })
+
+test('displays due date when present', () => {
+  const taskWithDue = { ...mockTask, due_at: '2026-12-31T23:59:00Z' }
+  render(<TaskItem task={taskWithDue} onToggle={() => {}} onDelete={() => {}} />)
+  const dueDate = document.querySelector('.task-due-date')
+  expect(dueDate).toBeInTheDocument()
+})
+
+test('does not display due date when absent', () => {
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={() => {}} />)
+  const dueDate = document.querySelector('.task-due-date')
+  expect(dueDate).not.toBeInTheDocument()
+})
+
+test('applies overdue class when task is overdue and not completed', () => {
+  const overdueTask = {
+    ...mockTask,
+    due_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    completed: false
+  }
+  render(<TaskItem task={overdueTask} onToggle={() => {}} onDelete={() => {}} />)
+  const taskItem = document.querySelector('.task-item')
+  expect(taskItem).toHaveClass('task-overdue')
+})
+
+test('applies due-soon class when task is due within 24 hours', () => {
+  const dueSoonTask = {
+    ...mockTask,
+    due_at: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
+    completed: false
+  }
+  render(<TaskItem task={dueSoonTask} onToggle={() => {}} onDelete={() => {}} />)
+  const taskItem = document.querySelector('.task-item')
+  expect(taskItem).toHaveClass('task-due-soon')
+})
+
+test('does not apply due status classes to completed tasks', () => {
+  const completedOverdueTask = {
+    ...mockTask,
+    due_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    completed: true
+  }
+  render(<TaskItem task={completedOverdueTask} onToggle={() => {}} onDelete={() => {}} />)
+  const taskItem = document.querySelector('.task-item')
+  expect(taskItem).not.toHaveClass('task-overdue')
+  expect(taskItem).not.toHaveClass('task-due-soon')
+})

@@ -2,12 +2,18 @@ import { useState } from 'react'
 
 function TaskForm({ onTaskCreated }) {
   const [title, setTitle] = useState('')
+  const [dueAt, setDueAt] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (title.trim()) {
-      await onTaskCreated(title)
+      const taskData = { title }
+      if (dueAt) {
+        taskData.due_at = dueAt
+      }
+      await onTaskCreated(taskData)
       setTitle('')
+      setDueAt('')
     }
   }
 
@@ -19,6 +25,12 @@ function TaskForm({ onTaskCreated }) {
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Nueva tarea..."
         className="task-input"
+      />
+      <input
+        type="datetime-local"
+        value={dueAt}
+        onChange={(e) => setDueAt(e.target.value)}
+        className="task-due-input"
       />
       <button type="submit" className="btn btn-primary">
         Añadir
