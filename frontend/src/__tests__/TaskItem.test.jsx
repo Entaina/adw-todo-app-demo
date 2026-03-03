@@ -51,8 +51,51 @@ test('calls onDelete when delete button is clicked', () => {
   const mockDelete = vi.fn()
   render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
 
-  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+  // Click delete button to open confirm dialog
+  const deleteButton = screen.getByRole('button', { name: /eliminar/i })
+  fireEvent.click(deleteButton)
+
+  // Verify confirm dialog appears with task title
+  expect(screen.getByText('Eliminar tarea')).toBeInTheDocument()
+  expect(screen.getByText(/¿Estás seguro de que quieres eliminar "Test task"\?/i)).toBeInTheDocument()
+
+  // Click confirm button in dialog
+  const confirmButton = screen.getAllByRole('button', { name: /eliminar/i })[1]
+  fireEvent.click(confirmButton)
+
+  // Verify onDelete was called with correct id
   expect(mockDelete).toHaveBeenCalledWith(1)
+})
+
+test('does not call onDelete when cancel button is clicked', () => {
+  const mockDelete = vi.fn()
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
+
+  // Click delete button to open confirm dialog
+  const deleteButton = screen.getByRole('button', { name: /eliminar/i })
+  fireEvent.click(deleteButton)
+
+  // Click cancel button in dialog
+  const cancelButton = screen.getByRole('button', { name: /cancelar/i })
+  fireEvent.click(cancelButton)
+
+  // Verify onDelete was not called
+  expect(mockDelete).not.toHaveBeenCalled()
+
+  // Verify dialog is closed
+  expect(screen.queryByText('Eliminar tarea')).not.toBeInTheDocument()
+})
+
+test('shows task title in confirm dialog message', () => {
+  const taskWithLongTitle = { ...mockTask, title: 'This is a very long task title' }
+  render(<TaskItem task={taskWithLongTitle} onToggle={() => {}} onDelete={() => {}} />)
+
+  // Click delete button to open confirm dialog
+  const deleteButton = screen.getByRole('button', { name: /eliminar/i })
+  fireEvent.click(deleteButton)
+
+  // Verify the dialog shows the task title
+  expect(screen.getByText(/¿Estás seguro de que quieres eliminar "This is a very long task title"\?/i)).toBeInTheDocument()
 })
 
 test('renders drag handle', () => {
