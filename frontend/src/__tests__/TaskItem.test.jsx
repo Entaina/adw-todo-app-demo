@@ -51,7 +51,22 @@ test('calls onDelete when delete button is clicked', () => {
   const mockDelete = vi.fn()
   render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
 
-  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+  // Click delete button - should show confirmation dialog
+  const deleteButton = screen.getAllByRole('button', { name: /eliminar/i })[0]
+  fireEvent.click(deleteButton)
+
+  // onDelete should NOT be called immediately
+  expect(mockDelete).not.toHaveBeenCalled()
+
+  // Dialog should be visible
+  expect(screen.getByText('Eliminar tarea')).toBeInTheDocument()
+  expect(screen.getByText(/¿Estás seguro de que deseas eliminar la tarea "Test task"\?/i)).toBeInTheDocument()
+
+  // Click confirm button in dialog
+  const confirmButton = screen.getAllByRole('button', { name: /eliminar/i })[1]
+  fireEvent.click(confirmButton)
+
+  // Now onDelete should be called
   expect(mockDelete).toHaveBeenCalledWith(1)
 })
 
