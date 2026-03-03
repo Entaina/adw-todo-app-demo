@@ -10,6 +10,9 @@ module Adw
       "planning" => "📋",
       "implementing" => "🔨",
       "testing" => "🧪",
+      "reviewing" => "🔍",
+      "documenting" => "📝",
+      "patching" => "🩹",
       "committing" => "💾",
       "creating_pr" => "🔗",
       "done" => "✅",
@@ -18,11 +21,16 @@ module Adw
 
     STATUSES = STATUS_EMOJIS.keys.freeze
 
+    COMMENT_MARKER = "<!-- adw_tracker:v1 -->"
+
     LABEL_COLORS = {
       "adw/classifying"  => "C2E0C6",
       "adw/planning"     => "BFD4F2",
       "adw/implementing" => "FEF2C0",
       "adw/testing"      => "D4E157",
+      "adw/reviewing"    => "F9A825",
+      "adw/documenting"  => "90CAF9",
+      "adw/patching"     => "FBCA04",
       "adw/committing"   => "D4C5F9",
       "adw/creating_pr"  => "BFDADC",
       "adw/done"         => "0E8A16",
@@ -43,7 +51,7 @@ module Adw
         lines << "| **Classification** | #{tracker[:classification] || "pending"} |"
         lines << "| **Branch** | #{tracker[:branch_name] ? "`#{tracker[:branch_name]}`" : "pending"} |"
         lines << ""
-        lines << "<!-- adw_tracker:v1 -->"
+        lines << COMMENT_MARKER
 
         lines.join("\n")
       end

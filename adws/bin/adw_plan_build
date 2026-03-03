@@ -21,6 +21,8 @@ require "bundler/setup"
 require "dotenv/load"
 require_relative "../lib/adw"
 
+include Adw::PipelineHelpers
+
 # Agent name constants
 AGENT_PLANNER = "sdlc_planner"
 AGENT_IMPLEMENTOR = "sdlc_implementor"
@@ -40,14 +42,6 @@ def parse_args
   adw_id = ARGV[1]
 
   [issue_number, adw_id]
-end
-
-def format_issue_message(adw_id, agent_name, message, session_id = nil)
-  if session_id
-    "#{adw_id}_#{agent_name}_#{session_id}: #{message}"
-  else
-    "#{adw_id}_#{agent_name}: #{message}"
-  end
 end
 
 def classify_issue(issue, adw_id, logger)
@@ -183,22 +177,6 @@ def pull_request(branch_name, issue, adw_id, logger)
   [pr_url, nil]
 end
 
-def check_error(error_or_response, issue_number, error_prefix, logger, tracker)
-  error = nil
-
-  if error_or_response.is_a?(Adw::AgentPromptResponse)
-    error = error_or_response.output unless error_or_response.success
-  else
-    error = error_or_response
-  end
-
-  return unless error
-
-  logger.error("#{error_prefix}: #{error}")
-  Adw::Tracker.update(tracker, issue_number, "error", logger)
-  exit 1
-end
-
 def main
   # Parse arguments
   issue_number, adw_id = parse_args
@@ -243,7 +221,7 @@ def main
   tracker[:branch_name] = branch_name
 
   # Build the implementation plan
-  plan_path = ".issues/#{issue_number}/plan.md"
+  plan_path = Adw::PipelineHelpers.plan_path_for(issue_number)
   Adw::Tracker.update(tracker, issue_number, "planning", logger)
 
   issue_plan_response = build_plan(issue, issue_command, plan_path, adw_id, logger)
@@ -272,21 +250,7 @@ def main
 
   logger.debug("implement_response.output: #{implement_response.output}")
 
-  # Commit the implementation
-  Adw::Tracker.update(tracker, issue_number, "committing", logger)
-  commit_msg, error = git_commit(AGENT_IMPLEMENTOR, issue, issue_command, adw_id, logger)
-  check_error(error, issue_number, "Error committing implementation", logger, tracker)
-
-  # Create pull request
-  Adw::Tracker.update(tracker, issue_number, "creating_pr", logger)
-  pr_url, error = pull_request(branch_name, issue, adw_id, logger)
-  check_error(error, issue_number, "Error creating pull request", logger, tracker)
-
-  logger.info("Pull request created: #{pr_url}")
-
-  # Done
-  Adw::Tracker.update(tracker, issue_number, "done", logger)
-  logger.info("ADW workflow completed successfully for issue ##{issue_number}")
+  logger.info("ADW plan & build completed for issue ##{issue_number}. Pending: test, review, document, commit, PR.")
 end
 
 main

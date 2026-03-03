@@ -1,0 +1,295 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+#
+# ADW Patch - AI Developer Workflow (ADW)
+#
+# Usage: adw_patch <github-issue-number> <comment-body> [adw-id]
+#
+# Punto de entrada para validacion humana post-pipeline.
+# Cuando un humano comenta en una issue con adw/done, este script:
+# 1. Clasifica el comentario (patch o none)
+# 2. Si es patch: crea un patch plan focalizado
+# 3. Implementa el patch
+# 4. Ejecuta tests con resolucion automatica
+# 5. Commit y push de los cambios
+# 6. Vuelve al estado adw/done
+#
+
+require "bundler/setup"
+require "dotenv/load"
+require_relative "../lib/adw"
+
+include Adw::PipelineHelpers
+
+# Constantes de agentes
+AGENT_CLASSIFIER = "comment_classifier"
+AGENT_PATCHER = "patch_planner"
+AGENT_IMPLEMENTOR = "patch_implementor"
+AGENT_TESTER = "patch_test_runner"
+
+def parse_args
+  if ARGV.length < 2
+    puts "Usage: adw_patch <issue-number> <comment-body> [adw-id]"
+    puts "Example: adw_patch 123 \"Cambia el color del boton a rojo\""
+    puts "Example: adw_patch 123 \"Falta validacion del email\" abc12345"
+    exit 1
+  end
+
+  issue_number = ARGV[0]
+  comment_body = ARGV[1]
+  adw_id = ARGV[2]
+
+  [issue_number, comment_body, adw_id]
+end
+
+# --- Clasificacion ---
+
+def classify_comment(comment_body, adw_id, logger)
+  request = Adw::AgentTemplateRequest.new(
+    agent_name: AGENT_CLASSIFIER,
+    slash_command: "/adw:classify_comment",
+    args: [comment_body],
+    adw_id: adw_id,
+    model: "sonnet"
+  )
+
+  logger.debug("classify_comment_request: #{request.to_h}")
+  response = Adw::Agent.execute_template(request)
+  logger.debug("classify_comment_response: #{response.to_h}")
+
+  unless response.success
+    logger.error("Error clasificando comentario: #{response.output}")
+    return nil
+  end
+
+  classification = response.output.strip.downcase
+  logger.info("Clasificacion del comentario: #{classification}")
+  classification
+end
+
+# --- Patch plan ---
+
+def find_original_plan(issue_number)
+  plan_path = Adw::PipelineHelpers.plan_path_for(issue_number)
+  File.exist?(plan_path) ? plan_path : ""
+end
+
+def create_patch_plan(adw_id, change_request, plan_path, issue_number, logger)
+  args = [adw_id, change_request]
+  args << plan_path unless plan_path.empty?
+
+  request = Adw::AgentTemplateRequest.new(
+    agent_name: AGENT_PATCHER,
+    slash_command: "/adw:patch",
+    args: args,
+    adw_id: adw_id,
+    model: "opus"
+  )
+
+  logger.info("Creando patch plan...")
+  response = Adw::Agent.execute_template(request)
+
+  unless response.success
+    return [nil, response.output]
+  end
+
+  patch_file = response.output.strip
+  logger.info("Patch plan creado: #{patch_file}")
+  [patch_file, nil]
+end
+
+# --- Implementacion ---
+
+def implement_patch(patch_file, adw_id, logger)
+  request = Adw::AgentTemplateRequest.new(
+    agent_name: AGENT_IMPLEMENTOR,
+    slash_command: "/implement",
+    args: [patch_file],
+    adw_id: adw_id,
+    model: "sonnet"
+  )
+
+  logger.info("Implementando patch: #{patch_file}")
+  response = Adw::Agent.execute_template(request)
+  logger.debug("implement_response: #{response.to_h}")
+
+  response
+end
+
+# --- Commit y push ---
+
+def commit_and_push(issue_number, adw_id, tracker, logger)
+  # Comprobar si hay cambios pendientes
+  stdout, _, status = Open3.capture3("git", "status", "--porcelain")
+  if status.success? && stdout.strip.empty?
+    logger.info("No hay cambios pendientes para commit")
+    return
+  end
+
+  commit_request = Adw::AgentTemplateRequest.new(
+    agent_name: "patch_committer",
+    slash_command: "/git:commit",
+    args: ["-m", "\"patch: apply human feedback for ##{issue_number}\""],
+    adw_id: adw_id,
+    model: "sonnet"
+  )
+
+  response = Adw::Agent.execute_template(commit_request)
+  check_error(response, issue_number, "Error committing patch", logger, tracker)
+  logger.info("Patch commiteado correctamente")
+
+  # Push de los cambios
+  _, stderr, push_status = Open3.capture3("git", "push")
+  if push_status.success?
+    logger.info("Cambios pusheados correctamente")
+  else
+    logger.warn("Warning: No se pudieron pushear los cambios: #{stderr}")
+  end
+end
+
+# --- Branch management ---
+
+def checkout_branch(branch_name, logger)
+  # Pull latest changes on the branch
+  _, _, status = Open3.capture3("git", "checkout", branch_name)
+  unless status.success?
+    logger.error("Error haciendo checkout de la rama #{branch_name}")
+    return false
+  end
+
+  _, _, pull_status = Open3.capture3("git", "pull", "--rebase")
+  unless pull_status.success?
+    logger.warn("Warning: No se pudo hacer pull de #{branch_name}")
+  end
+
+  logger.info("Checkout a rama: #{branch_name}")
+  true
+end
+
+# --- Workflow principal ---
+
+def main
+  issue_number, comment_body, adw_id = parse_args
+
+  # Generar ADW ID si no se proporciono
+  adw_id ||= Adw::Utils.make_adw_id
+
+  # Configurar logger
+  logger = Adw::Utils.setup_logger(adw_id, "adw_patch")
+  logger.info("ADW Patch - ID: #{adw_id}")
+  logger.info("Issue: ##{issue_number}")
+  logger.info("Comentario: #{comment_body[0..100]}")
+
+  # Cargar tracker existente
+  tracker = Adw::Tracker.load(issue_number)
+  unless tracker
+    logger.error("No se encontro tracker para issue ##{issue_number}")
+    exit 1
+  end
+  tracker[:adw_id] = adw_id
+
+  # Checkout de la rama existente
+  branch_name = tracker[:branch_name]
+  unless branch_name
+    logger.error("No se encontro branch_name en el tracker de issue ##{issue_number}")
+    Adw::Tracker.update(tracker, issue_number, "error", logger)
+    exit 1
+  end
+
+  unless checkout_branch(branch_name, logger)
+    Adw::Tracker.update(tracker, issue_number, "error", logger)
+    exit 1
+  end
+
+  # Paso 1: Clasificar comentario
+  logger.info("\n=== Clasificando comentario ===")
+  classification = classify_comment(comment_body, adw_id, logger)
+
+  if classification != "patch"
+    logger.info("Comentario no requiere patch (clasificacion: #{classification})")
+    Adw::GitHub.create_issue_comment(
+      issue_number,
+      format_issue_message(adw_id, "patch_ops", "Comentario analizado: no requiere cambios de codigo.")
+    )
+    exit 0
+  end
+
+  # Paso 2: Actualizar tracker a patching
+  Adw::Tracker.update(tracker, issue_number, "patching", logger)
+  Adw::GitHub.create_issue_comment(
+    issue_number,
+    format_issue_message(adw_id, "patch_ops", "Iniciando ciclo de patch para: #{comment_body[0..200]}")
+  )
+
+  # Paso 3: Crear patch plan
+  logger.info("\n=== Creando patch plan ===")
+  plan_path = find_original_plan(issue_number)
+  patch_file, error = create_patch_plan(adw_id, comment_body, plan_path, issue_number, logger)
+  check_error(error, issue_number, "Error creando patch plan", logger, tracker)
+
+  Adw::GitHub.create_issue_comment(
+    issue_number,
+    format_issue_message(adw_id, AGENT_PATCHER, "Patch plan creado: `#{patch_file}`")
+  )
+
+  # Paso 4: Implementar patch
+  logger.info("\n=== Implementando patch ===")
+  Adw::Tracker.update(tracker, issue_number, "implementing", logger)
+  implement_response = implement_patch(patch_file, adw_id, logger)
+  check_error(implement_response, issue_number, "Error implementando patch", logger, tracker)
+
+  Adw::GitHub.create_issue_comment(
+    issue_number,
+    format_issue_message(adw_id, AGENT_IMPLEMENTOR, "Patch implementado correctamente")
+  )
+
+  # Paso 5: Ejecutar tests
+  logger.info("\n=== Ejecutando tests ===")
+  Adw::Tracker.update(tracker, issue_number, "testing", logger)
+  Adw::GitHub.create_issue_comment(
+    issue_number,
+    format_issue_message(adw_id, AGENT_TESTER, "Ejecutando tests tras patch...")
+  )
+
+  results, passed_count, failed_count = run_tests_with_resolution(
+    adw_id, issue_number, logger,
+    test_agent_name: AGENT_TESTER,
+    resolver_prefix: "patch_test_resolver",
+    ops_agent_name: "patch_ops",
+    verbose_comments: false
+  )
+
+  logger.info("Resultados de tests: #{passed_count} pasados, #{failed_count} fallidos")
+
+  if failed_count > 0
+    logger.error("Tests fallidos tras patch: #{failed_count} fallos pendientes")
+    Adw::GitHub.create_issue_comment(
+      issue_number,
+      format_issue_message(adw_id, AGENT_TESTER, "Tests fallidos tras patch: #{failed_count} fallos. Pipeline detenido.")
+    )
+    Adw::Tracker.update(tracker, issue_number, "error", logger)
+    exit 1
+  end
+
+  Adw::GitHub.create_issue_comment(
+    issue_number,
+    format_issue_message(adw_id, AGENT_TESTER, "Todos los tests pasaron correctamente tras patch")
+  )
+
+  # Paso 6: Commit y push
+  logger.info("\n=== Commit y push ===")
+  Adw::Tracker.update(tracker, issue_number, "committing", logger)
+  commit_and_push(issue_number, adw_id, tracker, logger)
+
+  # Paso 7: Volver a done
+  Adw::Tracker.update(tracker, issue_number, "done", logger)
+  Adw::GitHub.create_issue_comment(
+    issue_number,
+    format_issue_message(adw_id, "patch_ops", "Patch completado correctamente para issue ##{issue_number}")
+  )
+
+  logger.info("ADW Patch completado correctamente para issue ##{issue_number}")
+end
+
+main
