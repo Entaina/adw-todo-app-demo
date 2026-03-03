@@ -19,4 +19,7 @@ adws/log/
 # GitHub CLI auth (Docker)
 .gh/
 
+# Dependencies
+node_modules/
+
 .env
