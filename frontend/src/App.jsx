@@ -23,8 +23,21 @@ function App() {
 
   const handleToggleTask = async (id) => {
     const task = tasks.find(t => t.id === id)
-    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t))
-    await updateTask(id, { completed: !task.completed })
+    const newCompleted = !task.completed
+
+    if (task.completed && !newCompleted) {
+      // Tarea se desmarca: moverla al final de las pendientes
+      const otherTasks = tasks.filter(t => t.id !== id)
+      const pendingTasks = otherTasks.filter(t => !t.completed)
+      const completedTasks = otherTasks.filter(t => t.completed)
+      const updatedTask = { ...task, completed: newCompleted }
+      setTasks([...pendingTasks, updatedTask, ...completedTasks])
+    } else {
+      // Comportamiento normal para marcar como completada
+      setTasks(tasks.map(t => t.id === id ? { ...t, completed: newCompleted } : t))
+    }
+
+    await updateTask(id, { completed: newCompleted })
   }
 
   const handleDeleteTask = async (id) => {
