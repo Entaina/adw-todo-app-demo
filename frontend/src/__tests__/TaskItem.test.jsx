@@ -47,12 +47,41 @@ test('calls onToggle when checkbox is clicked', () => {
   expect(mockToggle).toHaveBeenCalledWith(1)
 })
 
-test('calls onDelete when delete button is clicked', () => {
+test('calls onDelete when delete button is clicked and confirmed', () => {
   const mockDelete = vi.fn()
   render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
 
+  // Click delete button to open dialog
   fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+
+  // Click confirm button in dialog
+  const confirmButton = screen.getAllByRole('button', { name: /eliminar/i })[1]
+  fireEvent.click(confirmButton)
+
   expect(mockDelete).toHaveBeenCalledWith(1)
+})
+
+test('does not call onDelete when cancel is clicked', () => {
+  const mockDelete = vi.fn()
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
+
+  // Click delete button to open dialog
+  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+
+  // Click cancel button in dialog
+  fireEvent.click(screen.getByRole('button', { name: /cancelar/i }))
+
+  expect(mockDelete).not.toHaveBeenCalled()
+})
+
+test('shows confirmation dialog when delete is clicked', () => {
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={() => {}} />)
+
+  // Click delete button to open dialog
+  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+
+  // Verify confirmation message appears with task title
+  expect(screen.getByText(/¿Estás seguro de que quieres eliminar "Test task"\?/i)).toBeInTheDocument()
 })
 
 test('renders drag handle', () => {
