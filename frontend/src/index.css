@@ -148,3 +148,17 @@ p {
   text-decoration: line-through;
   color: #999;
 }
+
+/* Completed Section */
+.completed-section {
+  margin-top: 1.5rem;
+}
+
+.section-header {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
+}

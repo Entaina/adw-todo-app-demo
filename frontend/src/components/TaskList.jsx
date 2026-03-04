@@ -15,31 +15,59 @@ function TaskList({ tasks, onToggle, onDelete, onReorder }) {
     return <p className="empty-message">No hay tareas. ¡Crea una nueva!</p>
   }
 
+  // Separar tareas pendientes y completadas
+  const pendingTasks = tasks.filter(task => !task.completed)
+  const completedTasks = tasks.filter(task => task.completed)
+
   const handleDragEnd = (event) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
 
-    const oldIndex = tasks.findIndex(t => t.id === active.id)
-    const newIndex = tasks.findIndex(t => t.id === over.id)
-    const newTasks = arrayMove(tasks, oldIndex, newIndex)
-    onReorder(newTasks.map(t => t.id))
+    // Solo permitir reordenar entre tareas pendientes
+    const oldIndex = pendingTasks.findIndex(t => t.id === active.id)
+    const newIndex = pendingTasks.findIndex(t => t.id === over.id)
+    const newPendingTasks = arrayMove(pendingTasks, oldIndex, newIndex)
+
+    // Combinar el nuevo orden de pendientes con las completadas
+    const allTaskIds = [...newPendingTasks.map(t => t.id), ...completedTasks.map(t => t.id)]
+    onReorder(allTaskIds)
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-        <div className="task-list">
-          {tasks.map(task => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              onToggle={onToggle}
-              onDelete={onDelete}
-            />
-          ))}
+    <div>
+      {/* Seccion de tareas pendientes */}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={pendingTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+          <div className="task-list">
+            {pendingTasks.map(task => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onToggle={onToggle}
+                onDelete={onDelete}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+
+      {/* Seccion de tareas completadas */}
+      {completedTasks.length > 0 && (
+        <div className="completed-section">
+          <h3 className="section-header">Completadas</h3>
+          <div className="task-list">
+            {completedTasks.map(task => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onToggle={onToggle}
+                onDelete={onDelete}
+              />
+            ))}
+          </div>
         </div>
-      </SortableContext>
-    </DndContext>
+      )}
+    </div>
   )
 }
 
