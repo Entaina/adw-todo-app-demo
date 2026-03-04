@@ -93,6 +93,49 @@ p {
   gap: 0.5rem;
 }
 
+.pending-tasks,
+.completed-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.completed-tasks {
+  background-color: #fafafa;
+  padding: 0.75rem;
+  border-radius: 4px;
+}
+
+.tasks-separator {
+  margin: 1rem 0;
+  padding: 0.5rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.tasks-separator::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #ddd;
+  z-index: 0;
+}
+
+.tasks-separator span {
+  position: relative;
+  z-index: 1;
+  background-color: white;
+  padding: 0 1rem;
+  color: #999;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .empty-message {
   text-align: center;
   color: #999;
