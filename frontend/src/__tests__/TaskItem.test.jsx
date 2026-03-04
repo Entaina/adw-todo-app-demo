@@ -47,12 +47,64 @@ test('calls onToggle when checkbox is clicked', () => {
   expect(mockToggle).toHaveBeenCalledWith(1)
 })
 
-test('calls onDelete when delete button is clicked', () => {
+test('shows confirm dialog when delete button is clicked', () => {
   const mockDelete = vi.fn()
   render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
 
-  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+  // Click the delete button
+  const deleteButton = screen.getAllByText('Eliminar')[0]
+  fireEvent.click(deleteButton)
+
+  // Check that the dialog is shown
+  expect(screen.getByRole('dialog')).toBeInTheDocument()
+  expect(screen.getByText('Confirmar eliminación')).toBeInTheDocument()
+  expect(screen.getByText('¿Estás seguro de que quieres eliminar "Test task"?')).toBeInTheDocument()
+})
+
+test('calls onDelete when confirm button in dialog is clicked', () => {
+  const mockDelete = vi.fn()
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
+
+  // Click the delete button to open dialog
+  const deleteButton = screen.getAllByText('Eliminar')[0]
+  fireEvent.click(deleteButton)
+
+  // Click the confirm button in the dialog
+  const confirmButton = screen.getAllByText('Eliminar')[1]
+  fireEvent.click(confirmButton)
+
+  // Check that onDelete was called
   expect(mockDelete).toHaveBeenCalledWith(1)
+})
+
+test('does not call onDelete when cancel button is clicked', () => {
+  const mockDelete = vi.fn()
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
+
+  // Click the delete button to open dialog
+  const deleteButton = screen.getAllByText('Eliminar')[0]
+  fireEvent.click(deleteButton)
+
+  // Click the cancel button
+  const cancelButton = screen.getByText('Cancelar')
+  fireEvent.click(cancelButton)
+
+  // Check that onDelete was NOT called
+  expect(mockDelete).not.toHaveBeenCalled()
+  // Check that the dialog is closed
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+})
+
+test('displays task title in confirmation dialog message', () => {
+  const taskWithLongTitle = { ...mockTask, title: 'My important task with a long title' }
+  render(<TaskItem task={taskWithLongTitle} onToggle={() => {}} onDelete={() => {}} />)
+
+  // Click the delete button
+  const deleteButton = screen.getAllByText('Eliminar')[0]
+  fireEvent.click(deleteButton)
+
+  // Check that the dialog shows the task title
+  expect(screen.getByText('¿Estás seguro de que quieres eliminar "My important task with a long title"?')).toBeInTheDocument()
 })
 
 test('renders drag handle', () => {

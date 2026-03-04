@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import ConfirmDialog from './ConfirmDialog'
 
 function TaskItem({ task, onToggle, onDelete }) {
+  const [showConfirm, setShowConfirm] = useState(false)
   const {
     attributes,
     listeners,
@@ -34,11 +37,23 @@ function TaskItem({ task, onToggle, onDelete }) {
         {task.title}
       </span>
       <button
-        onClick={() => onDelete(task.id)}
+        onClick={() => setShowConfirm(true)}
         className="btn btn-delete"
       >
         Eliminar
       </button>
+      <ConfirmDialog
+        isOpen={showConfirm}
+        title="Confirmar eliminación"
+        message={`¿Estás seguro de que quieres eliminar "${task.title}"?`}
+        onConfirm={() => {
+          onDelete(task.id)
+          setShowConfirm(false)
+        }}
+        onCancel={() => setShowConfirm(false)}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+      />
     </div>
   )
 }
