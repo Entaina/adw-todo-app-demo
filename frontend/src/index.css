@@ -86,6 +86,26 @@ p {
   background-color: #c0392b;
 }
 
+/* Task Sections */
+.task-section {
+  margin-bottom: 1.5rem;
+}
+
+.task-section.completed-section {
+  background-color: #fafafa;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.section-header {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
 /* Task List */
 .task-list {
   display: flex;

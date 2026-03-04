@@ -22,3 +22,33 @@ test('renders correct number of task items', () => {
   const checkboxes = screen.getAllByRole('checkbox')
   expect(checkboxes).toHaveLength(2)
 })
+
+test('shows section headers for pending and completed tasks', () => {
+  render(<TaskList tasks={mockTasks} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+  expect(screen.getByText('Tareas pendientes')).toBeInTheDocument()
+  expect(screen.getByText('Tareas completadas')).toBeInTheDocument()
+})
+
+test('hides completed section when no completed tasks', () => {
+  const pendingTasks = [
+    { id: 1, title: 'Task 1', completed: false },
+    { id: 2, title: 'Task 2', completed: false }
+  ]
+  render(<TaskList tasks={pendingTasks} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+  expect(screen.getByText('Tareas pendientes')).toBeInTheDocument()
+  expect(screen.queryByText('Tareas completadas')).not.toBeInTheDocument()
+})
+
+test('renders pending tasks before completed tasks', () => {
+  const mixedTasks = [
+    { id: 1, title: 'Completed 1', completed: true },
+    { id: 2, title: 'Pending 1', completed: false },
+    { id: 3, title: 'Pending 2', completed: false },
+    { id: 4, title: 'Completed 2', completed: true }
+  ]
+  render(<TaskList tasks={mixedTasks} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+
+  const headers = screen.getAllByRole('heading', { level: 2 })
+  expect(headers[0]).toHaveTextContent('Tareas pendientes')
+  expect(headers[1]).toHaveTextContent('Tareas completadas')
+})
