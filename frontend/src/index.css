@@ -56,6 +56,19 @@ p {
   border-color: #3498db;
 }
 
+.task-date-input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.task-date-input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
 /* Buttons */
 .btn {
   padding: 0.5rem 1rem;
@@ -147,4 +160,28 @@ p {
 .task-title.completed {
   text-decoration: line-through;
   color: #999;
+}
+
+/* Task Deadline */
+.task-deadline {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.task-deadline.normal {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.task-deadline.soon {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.task-deadline.overdue {
+  background-color: #ffebee;
+  color: #c62828;
 }

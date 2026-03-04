@@ -4,6 +4,7 @@
 #
 #  id         :bigint           not null, primary key
 #  completed  :boolean          default(FALSE), not null
+#  deadline   :date
 #  position   :integer          default(0), not null
 #  title      :string           not null
 #  created_at :datetime         not null
@@ -59,5 +60,23 @@ class TaskTest < ActiveSupport::TestCase
     tasks = Task.all
     positions = tasks.map(&:position)
     assert_equal positions.sort, positions
+  end
+
+  test "deadline can be nil" do
+    task = Task.new(title: "Task without deadline")
+    assert task.valid?
+    assert_nil task.deadline
+  end
+
+  test "deadline accepts valid dates" do
+    task = Task.new(title: "Task with deadline", deadline: Date.tomorrow)
+    assert task.valid?
+    assert_equal Date.tomorrow, task.deadline
+  end
+
+  test "deadline accepts past dates" do
+    task = Task.new(title: "Overdue task", deadline: Date.yesterday)
+    assert task.valid?
+    assert_equal Date.yesterday, task.deadline
   end
 end

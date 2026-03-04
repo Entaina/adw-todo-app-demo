@@ -4,6 +4,7 @@
 #
 #  id         :bigint           not null, primary key
 #  completed  :boolean          default(FALSE), not null
+#  deadline   :date
 #  position   :integer          default(0), not null
 #  title      :string           not null
 #  created_at :datetime         not null
@@ -17,11 +18,13 @@ one:
   title: "Buy groceries"
   completed: false
   position: 0
+  deadline: <%= 3.days.from_now.to_date %>
 
 two:
   title: "Finish homework"
   completed: true
   position: 1
+  deadline: <%= 2.days.ago.to_date %>
 
 three:
   title: "Call dentist"

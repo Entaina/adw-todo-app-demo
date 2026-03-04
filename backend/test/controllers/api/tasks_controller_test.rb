@@ -149,4 +149,44 @@ class Api::TasksControllerTest < ActionDispatch::IntegrationTest
     positions = json_response.map { |t| t["position"] }
     assert_equal positions.sort, positions
   end
+
+  # Test para crear tarea con deadline
+  test "should create task with deadline" do
+    deadline_date = Date.tomorrow.to_s
+
+    assert_difference("Task.count", 1) do
+      post api_tasks_url, params: { task: { title: "Task with deadline", deadline: deadline_date } }, as: :json
+    end
+
+    assert_response :created
+    json_response = JSON.parse(response.body)
+    assert_equal "Task with deadline", json_response["title"]
+    assert_equal deadline_date, json_response["deadline"]
+  end
+
+  # Test para actualizar deadline
+  test "should update task deadline" do
+    task = tasks(:three)
+    new_deadline = Date.tomorrow.to_s
+
+    patch api_task_url(task), params: { task: { deadline: new_deadline } }, as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_equal new_deadline, json_response["deadline"]
+
+    task.reload
+    assert_equal Date.tomorrow, task.deadline
+  end
+
+  # Test para verificar que index devuelve deadline
+  test "index returns deadline in response" do
+    get api_tasks_url, as: :json
+    assert_response :success
+
+    json_response = JSON.parse(response.body)
+    json_response.each do |task|
+      assert task.key?("deadline")
+    end
+  end
 end

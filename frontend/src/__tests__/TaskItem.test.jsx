@@ -60,3 +60,31 @@ test('renders drag handle', () => {
   const handle = document.querySelector('.drag-handle')
   expect(handle).toBeInTheDocument()
 })
+
+test('shows deadline when present', () => {
+  const taskWithDeadline = { ...mockTask, deadline: '2026-03-15' }
+  render(<TaskItem task={taskWithDeadline} onToggle={() => {}} onDelete={() => {}} />)
+
+  const deadline = screen.getByText(/15 mar 2026/i)
+  expect(deadline).toBeInTheDocument()
+  expect(deadline).toHaveClass('task-deadline')
+})
+
+test('does not show deadline when not present', () => {
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={() => {}} />)
+
+  const deadline = document.querySelector('.task-deadline')
+  expect(deadline).not.toBeInTheDocument()
+})
+
+test('applies overdue class for past dates', () => {
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const dateString = yesterday.toISOString().split('T')[0]
+
+  const taskWithOverdueDeadline = { ...mockTask, deadline: dateString }
+  render(<TaskItem task={taskWithOverdueDeadline} onToggle={() => {}} onDelete={() => {}} />)
+
+  const deadline = document.querySelector('.task-deadline')
+  expect(deadline).toHaveClass('overdue')
+})
