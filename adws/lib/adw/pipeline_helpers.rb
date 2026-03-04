@@ -40,6 +40,45 @@ module Adw
       json_text
     end
 
+    def parse_review_results(output, logger)
+      json_text = extract_json_from_markdown(output)
+      data = JSON.parse(json_text)
+      {
+        overall_severity: data["overall_severity"],
+        summary: data["summary"],
+        checks: data["checks"] || [],
+        action_required: data["action_required"] || "none",
+        fix_suggestions: data["fix_suggestions"] || []
+      }
+    rescue JSON::ParserError => e
+      logger.error("Error parseando resultados de review: #{e}")
+      { overall_severity: "warning", summary: "No se pudieron parsear los resultados de la revision",
+        checks: [], action_required: "none", fix_suggestions: [] }
+    end
+
+    def format_review_comment(review_result)
+      parts = []
+      parts << "## Resultados de Revision de Codigo"
+      parts << ""
+      parts << "**Severidad general:** #{review_result[:overall_severity]}"
+      parts << "**Resumen:** #{review_result[:summary]}"
+      parts << ""
+      if review_result[:checks]&.any?
+        parts << "| Criterio | Resultado | Severidad | Detalles |"
+        parts << "|----------|-----------|-----------|----------|"
+        review_result[:checks].each do |check|
+          emoji = check["result"] == "PASS" ? "✅" : "❌"
+          parts << "| #{check['name']} | #{emoji} #{check['result']} | #{check['severity']} | #{check['details']} |"
+        end
+      end
+      if review_result[:fix_suggestions]&.any?
+        parts << ""
+        parts << "### Sugerencias de correccion"
+        review_result[:fix_suggestions].each { |s| parts << "- #{s}" }
+      end
+      parts.join("\n")
+    end
+
     def plan_path_for(issue_number)
       ".issues/#{issue_number}/plan.md"
     end

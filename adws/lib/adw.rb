@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "dotenv"
+require "service_actor"
 Dotenv.load(File.join(__dir__, "../.env"))
 
 module Adw
@@ -16,3 +17,11 @@ require_relative "adw/tracker"
 require_relative "adw/agent"
 require_relative "adw/pipeline_helpers"
 require_relative "adw/r2"
+
+# Load actors (pipeline_inputs must load first)
+require_relative "adw/actors/pipeline_inputs"
+Dir[File.join(__dir__, "adw/actors/**/*.rb")].sort.each { |f| require f }
+
+# Load workflows (plan_build must load before compositions that depend on it)
+require_relative "adw/workflows/plan_build"
+Dir[File.join(__dir__, "adw/workflows/**/*.rb")].sort.each { |f| require f }
