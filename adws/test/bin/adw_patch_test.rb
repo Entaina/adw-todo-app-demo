@@ -38,7 +38,7 @@ class AdwPatchTest < Minitest::Test
 
     # git commands
     Open3.stubs(:capture3).with("git", "checkout", anything).returns(["", "", FakeProcessStatus.new(true)])
-    Open3.stubs(:capture3).with("git", "pull", "--rebase", "origin", anything).returns(["", "", FakeProcessStatus.new(true)])
+    Open3.stubs(:capture3).with("git", "pull", "origin", anything).returns(["", "", FakeProcessStatus.new(true)])
     Open3.stubs(:capture3).with("git", "status", "--porcelain").returns(["  M file.rb\n", "", FakeProcessStatus.new(true)])
     Open3.stubs(:capture3).with("git", "push", "origin", anything).returns(["", "", FakeProcessStatus.new(true)])
   end
@@ -237,6 +237,52 @@ class AdwPatchTest < Minitest::Test
 
     refute result.success?
     assert_match(/tests failed/, result.error)
+  end
+
+  # setup_logger should be called for patch_adw_id so execution.log is created alongside agent outputs
+  def test_creates_execution_log_for_patch_adw_id
+    Adw::Utils.expects(:setup_logger)
+      .with(@issue_number, "patchid1", "adw_patch")
+      .returns(@logger).once
+
+    Adw::Agent.stubs(:execute_template).returns(
+      success_response(output: "patch"),
+      success_response(output: "patch plan made"),
+      success_response(output: "implemented"),
+      success_response(output: passing_test_json),
+      success_response(output: ok_review_json),
+      success_response(output: "visual ok"),
+      success_response(output: "docs ok"),
+      success_response(output: "committed")
+    )
+
+    result = Adw::Workflows::Patch.result(
+      issue_number: @issue_number,
+      adw_id: @adw_id,
+      logger: @logger,
+      comment_body: @comment_body
+    )
+
+    assert result.success?, "Expected success, got error: #{result.error}"
+  end
+
+  # setup_logger for patch_adw_id should NOT be called when comment is not a patch
+  def test_does_not_create_execution_log_when_comment_is_not_patch
+    Adw::Utils.expects(:setup_logger).with(@issue_number, "patchid1", "adw_patch").never
+
+    Adw::Agent.stubs(:execute_template).returns(
+      success_response(output: "none")
+    )
+
+    result = Adw::Workflows::Patch.result(
+      issue_number: @issue_number,
+      adw_id: @adw_id,
+      logger: @logger,
+      comment_body: "Just a comment"
+    )
+
+    assert result.success?
+    assert_equal "none", result.comment_classification
   end
 
   # When git checkout fails, patch should fail

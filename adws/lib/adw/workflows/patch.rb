@@ -56,6 +56,7 @@ module Adw
 
         # 5. Initialize patch tracker
         patch_adw_id = Adw::Utils.make_adw_id
+        patch_logger = Adw::Utils.setup_logger(issue_number, patch_adw_id, "adw_patch")
         patch_tracker = {
           adw_id: patch_adw_id,
           status: nil,
@@ -66,7 +67,7 @@ module Adw
 
         # Transition main tracker → patching
         Adw::Tracker.update(tracker, issue_number, "patching", logger)
-        Adw::Tracker.update_patch(patch_tracker, issue_number, "patching", logger)
+        Adw::Tracker.update_patch(patch_tracker, issue_number, "patching", patch_logger)
 
         # 6. Build patch plan
         patch_file = ".issues/#{issue_number}/patch-#{issue_number}-#{patch_adw_id}.md"
@@ -84,20 +85,20 @@ module Adw
         )
         patch_resp = Adw::Agent.execute_template(patch_req)
         unless patch_resp.success
-          Adw::Tracker.update_patch(patch_tracker, issue_number, "error", logger)
+          Adw::Tracker.update_patch(patch_tracker, issue_number, "error", patch_logger)
           Adw::Tracker.update(tracker, issue_number, "done", logger)
           fail!(error: "Patch plan failed: #{patch_resp.output}")
         end
 
         patch_tracker[:patch_file] = patch_file
-        plan_comment_id = post_plan_comment(issue_number, patch_adw_id, "patch_planner", patch_file, "Patch Plan", logger)
+        plan_comment_id = post_plan_comment(issue_number, patch_adw_id, "patch_planner", patch_file, "Patch Plan", patch_logger)
         Adw::Tracker.set_phase_comment(patch_tracker, "plan", plan_comment_id)
-        Adw::Tracker.add_patch(tracker, patch_file, plan_comment_id, patch_tracker[:comment_id], patch_adw_id, logger)
+        Adw::Tracker.add_patch(tracker, patch_file, plan_comment_id, patch_tracker[:comment_id], patch_adw_id, patch_logger)
         Adw::Tracker.save(issue_number, tracker)
         Adw::Tracker.save_patch(issue_number, patch_adw_id, patch_tracker)
 
         # 7. Implement patch
-        Adw::Tracker.update_patch(patch_tracker, issue_number, "implementing", logger)
+        Adw::Tracker.update_patch(patch_tracker, issue_number, "implementing", patch_logger)
         impl_req = Adw::AgentTemplateRequest.new(
           agent_name: "patch_implementor",
           slash_command: "/implement",
@@ -108,15 +109,15 @@ module Adw
         )
         impl_resp = Adw::Agent.execute_template(impl_req)
         unless impl_resp.success
-          Adw::Tracker.update_patch(patch_tracker, issue_number, "error", logger)
+          Adw::Tracker.update_patch(patch_tracker, issue_number, "error", patch_logger)
           Adw::Tracker.update(tracker, issue_number, "done", logger)
           fail!(error: "Patch implementation failed: #{impl_resp.output}")
         end
 
         # 8. Run tests with resolution
-        Adw::Tracker.update_patch(patch_tracker, issue_number, "testing", logger)
+        Adw::Tracker.update_patch(patch_tracker, issue_number, "testing", patch_logger)
         test_actor_result = Adw::Actors::TestWithResolution.result(
-          issue_number: issue_number, adw_id: patch_adw_id, logger: logger,
+          issue_number: issue_number, adw_id: patch_adw_id, logger: patch_logger,
           tracker: patch_tracker,
           test_agent_name: "patch_test_runner",
           resolver_prefix: "patch_test_resolver",
@@ -140,31 +141,31 @@ module Adw
         Adw::Tracker.save_patch(issue_number, patch_adw_id, patch_tracker)
 
         if failed_count > 0
-          Adw::Tracker.update_patch(patch_tracker, issue_number, "error", logger)
+          Adw::Tracker.update_patch(patch_tracker, issue_number, "error", patch_logger)
           Adw::Tracker.update(tracker, issue_number, "done", logger)
           fail!(error: "#{failed_count} tests failed after patch")
         end
 
         # 9. Review code
-        Adw::Tracker.update_patch(patch_tracker, issue_number, "reviewing", logger)
-        review_result = run_patch_review(issue, patch_tracker, patch_adw_id, logger)
+        Adw::Tracker.update_patch(patch_tracker, issue_number, "reviewing", patch_logger)
+        review_result = run_patch_review(issue, patch_tracker, patch_adw_id, patch_logger)
 
         if review_result[:overall_severity] == "critical" && review_result[:action_required] == "fix_and_rerun"
-          Adw::Tracker.update_patch(patch_tracker, issue_number, "error", logger)
+          Adw::Tracker.update_patch(patch_tracker, issue_number, "error", patch_logger)
           Adw::Tracker.update(tracker, issue_number, "done", logger)
           fail!(error: "Critical review issues unresolvable: #{review_result[:summary]}")
         end
 
         # 10. Visual review (non-blocking)
-        Adw::Tracker.update_patch(patch_tracker, issue_number, "reviewing_issue", logger)
-        run_patch_issue_review(issue, patch_tracker, patch_adw_id, logger)
+        Adw::Tracker.update_patch(patch_tracker, issue_number, "reviewing_issue", patch_logger)
+        run_patch_issue_review(issue, patch_tracker, patch_adw_id, patch_logger)
 
         # 11. Documentation (non-blocking)
-        Adw::Tracker.update_patch(patch_tracker, issue_number, "documenting", logger)
-        run_patch_docs(patch_tracker, patch_adw_id, logger)
+        Adw::Tracker.update_patch(patch_tracker, issue_number, "documenting", patch_logger)
+        run_patch_docs(patch_tracker, patch_adw_id, patch_logger)
 
         # 12. Commit changes
-        Adw::Tracker.update_patch(patch_tracker, issue_number, "committing", logger)
+        Adw::Tracker.update_patch(patch_tracker, issue_number, "committing", patch_logger)
         git_out, _, git_st = Open3.capture3("git", "status", "--porcelain")
         unless git_st.success? && git_out.strip.empty?
           commit_req = Adw::AgentTemplateRequest.new(
@@ -177,7 +178,7 @@ module Adw
           )
           commit_resp = Adw::Agent.execute_template(commit_req)
           unless commit_resp.success
-            Adw::Tracker.update_patch(patch_tracker, issue_number, "error", logger)
+            Adw::Tracker.update_patch(patch_tracker, issue_number, "error", patch_logger)
             Adw::Tracker.update(tracker, issue_number, "done", logger)
             fail!(error: "Commit failed: #{commit_resp.output}")
           end
@@ -185,12 +186,12 @@ module Adw
 
         # 13. Push branch
         _, push_stderr, push_st = Open3.capture3("git", "push", "origin", branch_name)
-        logger.warn("Push failed (non-blocking): #{push_stderr.strip}") unless push_st.success?
+        patch_logger.warn("Push failed (non-blocking): #{push_stderr.strip}") unless push_st.success?
 
         # 14. Done
-        Adw::Tracker.update_patch(patch_tracker, issue_number, "done", logger)
+        Adw::Tracker.update_patch(patch_tracker, issue_number, "done", patch_logger)
         Adw::Tracker.update(tracker, issue_number, "done", logger)
-        logger.info("Patch workflow completed for issue ##{issue_number}")
+        patch_logger.info("Patch workflow completed for issue ##{issue_number}")
       end
 
       private
