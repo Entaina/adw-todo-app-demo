@@ -22,3 +22,10 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando trabajes con cualquier cosa bajo frontend/
     - Cuando necesites saber como arrancar o testear la aplicacion React
     - Cuando trabajes con componentes, servicios o estilos del frontend
+
+- app_docs/feature-62-background-color-change.md
+  - Condiciones:
+    - Cuando se trabaje con estilos globales del frontend
+    - Cuando se modifiquen colores de fondo de la aplicación
+    - Cuando se implemente cambios visuales/estéticos en index.css
+    - Cuando se necesite entender el esquema de colores de la interfaz
