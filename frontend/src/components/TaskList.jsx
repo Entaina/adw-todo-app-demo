@@ -15,21 +15,25 @@ function TaskList({ tasks, onToggle, onDelete, onReorder }) {
     return <p className="empty-message">No hay tareas. ¡Crea una nueva!</p>
   }
 
+  const pendingTasks = tasks.filter(task => !task.completed)
+  const completedTasks = tasks.filter(task => task.completed)
+
   const handleDragEnd = (event) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
 
-    const oldIndex = tasks.findIndex(t => t.id === active.id)
-    const newIndex = tasks.findIndex(t => t.id === over.id)
-    const newTasks = arrayMove(tasks, oldIndex, newIndex)
-    onReorder(newTasks.map(t => t.id))
+    const oldIndex = pendingTasks.findIndex(t => t.id === active.id)
+    const newIndex = pendingTasks.findIndex(t => t.id === over.id)
+    const reorderedPending = arrayMove(pendingTasks, oldIndex, newIndex)
+    const allTaskIds = [...reorderedPending.map(t => t.id), ...completedTasks.map(t => t.id)]
+    onReorder(allTaskIds)
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-        <div className="task-list">
-          {tasks.map(task => (
+    <div className="task-list">
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={pendingTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+          {pendingTasks.map(task => (
             <TaskItem
               key={task.id}
               task={task}
@@ -37,9 +41,25 @@ function TaskList({ tasks, onToggle, onDelete, onReorder }) {
               onDelete={onDelete}
             />
           ))}
-        </div>
-      </SortableContext>
-    </DndContext>
+        </SortableContext>
+      </DndContext>
+
+      {completedTasks.length > 0 && (
+        <>
+          <div className="tasks-separator">
+            <span>Completadas</span>
+          </div>
+          {completedTasks.map(task => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              onToggle={onToggle}
+              onDelete={onDelete}
+            />
+          ))}
+        </>
+      )}
+    </div>
   )
 }
 

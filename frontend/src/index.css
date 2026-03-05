@@ -148,3 +148,27 @@ p {
   text-decoration: line-through;
   color: #999;
 }
+
+/* Tasks Separator */
+.tasks-separator {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0 1rem;
+  text-align: center;
+}
+
+.tasks-separator::before,
+.tasks-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.tasks-separator span {
+  padding: 0 1rem;
+  color: #999;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

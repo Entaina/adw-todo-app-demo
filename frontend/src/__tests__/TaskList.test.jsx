@@ -22,3 +22,45 @@ test('renders correct number of task items', () => {
   const checkboxes = screen.getAllByRole('checkbox')
   expect(checkboxes).toHaveLength(2)
 })
+
+test('pending tasks appear before completed tasks', () => {
+  const mixedTasks = [
+    { id: 1, title: 'Completed Task', completed: true },
+    { id: 2, title: 'Pending Task', completed: false }
+  ]
+  render(<TaskList tasks={mixedTasks} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+
+  const taskTitles = screen.getAllByText(/Task/)
+  expect(taskTitles[0]).toHaveTextContent('Pending Task')
+  expect(taskTitles[1]).toHaveTextContent('Completed Task')
+})
+
+test('shows separator when there are completed tasks', () => {
+  const mixedTasks = [
+    { id: 1, title: 'Pending Task', completed: false },
+    { id: 2, title: 'Completed Task', completed: true }
+  ]
+  render(<TaskList tasks={mixedTasks} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+
+  expect(screen.getByText('Completadas')).toBeInTheDocument()
+})
+
+test('does not show separator when all tasks are pending', () => {
+  const pendingTasks = [
+    { id: 1, title: 'Pending Task 1', completed: false },
+    { id: 2, title: 'Pending Task 2', completed: false }
+  ]
+  render(<TaskList tasks={pendingTasks} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+
+  expect(screen.queryByText('Completadas')).not.toBeInTheDocument()
+})
+
+test('does not show separator when all tasks are completed', () => {
+  const completedTasks = [
+    { id: 1, title: 'Completed Task 1', completed: true },
+    { id: 2, title: 'Completed Task 2', completed: true }
+  ]
+  render(<TaskList tasks={completedTasks} onToggle={() => {}} onDelete={() => {}} onReorder={() => {}} />)
+
+  expect(screen.queryByText('Completadas')).not.toBeInTheDocument()
+})
