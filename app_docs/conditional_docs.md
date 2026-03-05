@@ -29,3 +29,8 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando se modifique el color de fondo de la aplicacion
     - Cuando se implemente cambios de temas o paletas de colores
     - Cuando se resuelvan problemas de contraste o legibilidad visual
+    - Cuando se trabaje con el sistema de trackers ADW (adws/lib/adw/tracker.rb)
+    - Cuando se cree o modifique actors de inicialización en workflows ADW
+    - Cuando se refactorice el codigo de InitializeIssueTracker o InitializeWorkflowTracker
+    - Cuando se trabaje con workflows que usen InitializeTracker
+    - Cuando se modifique el rendering de comentarios GitHub en trackers

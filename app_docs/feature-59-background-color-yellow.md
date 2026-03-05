@@ -1,80 +1,138 @@
-# Background Color Change to Light Yellow
+# Feature: Cambiar Color de Fondo a Amarillo Clarito + Refactorización de Trackers ADW
 
-**ADW ID:** 59
+**ADW ID:** 987822b4
 **Fecha:** 2026-03-05
 **Especificacion:** /Users/elafo/workspace/entaina/aurgi-curso-desarrolladores-sample-app/trees/issue-59/.issues/59/plan.md
 
 ## Overview
 
-Cambio del color de fondo de la aplicación Todo List de gris claro (`#f5f5f5`) a amarillo clarito (`#FFFDE7`) para aportar un aspecto más cálido y acogedor, manteniendo la legibilidad y el contraste visual de todos los elementos de la interfaz.
+Se implementó el cambio de color de fondo de la aplicación Todo List de gris claro (`#f5f5f5`) a un amarillo muy clarito (`#FEFDF8`), proporcionando una apariencia más cálida y acogedora mientras se mantiene excelente legibilidad. Adicionalmente, se refactorizó el sistema de trackers ADW para unificar la inicialización de issue y workflow trackers en un solo actor.
 
 ## Que se Construyo
 
-- Modificación del color de fondo principal de la aplicación
-- Actualización de la propiedad `background-color` del selector `body` en los estilos globales
-- Implementación de color Material Design Yellow 50 (`#FFFDE7`)
+- Cambio de color de fondo del body en la aplicación frontend
+- Refactorización del sistema de trackers ADW: unificación de `InitializeIssueTracker` y `InitializeWorkflowTracker` en un único actor `InitializeTracker`
+- Simplificación del rendering de comentarios GitHub eliminando enlaces innecesarios
+- Actualización de tests para reflejar la nueva estructura de actors
 
 ## Implementacion Tecnica
 
 ### Ficheros Modificados
 
-- `frontend/src/index.css`: Se cambió el valor de `background-color` en el selector `body` de `#f5f5f5` (gris claro) a `#FFFDE7` (amarillo muy clarito de Material Design Yellow 50)
+#### Frontend
+- `frontend/src/index.css`: Cambió `background-color` del selector `body` de `#f5f5f5` (gris claro) a `#FEFDF8` (amarillo muy clarito, casi crema)
+
+#### ADW Framework - Refactorización de Trackers
+- `adws/lib/adw/actors/initialize_tracker.rb`: **Nuevo actor unificado** que reemplaza los dos actors separados. Inicializa tanto el issue tracker como el workflow tracker en una sola operación
+- `adws/lib/adw/actors/initialize_issue_tracker.rb`: **Renombrado** → `initialize_tracker.rb`
+- `adws/lib/adw/actors/initialize_workflow_tracker.rb`: **Eliminado** (funcionalidad fusionada en `InitializeTracker`)
+- `adws/lib/adw/tracker.rb`: Eliminación del método helper `comment_url`. Simplificación de `render_comment` en ambos módulos (Issue y Workflow) para eliminar enlaces a comentarios GitHub y mantener solo referencias locales
+- `adws/lib/adw/workflows/patch.rb`: Actualizado para usar el nuevo `InitializeTracker` en lugar de los dos actors separados
+- `adws/lib/adw/workflows/full_pipeline.rb`: Actualizado para usar el nuevo `InitializeTracker`
+- `adws/lib/adw/workflows/plan_build.rb`: Actualizado para usar el nuevo `InitializeTracker`
+- `adws/lib/adw/workflows/plan_build_test.rb`: Actualizado para usar el nuevo `InitializeTracker`
+- `adws/lib/adw/actors/build_patch_plan.rb`: Corrección menor de propagación de `branch_name`
+
+#### Tests
+- `adws/test/lib/adw/actors/initialize_tracker_test.rb`: **Renombrado y expandido** desde `initialize_issue_tracker_test.rb`. Ahora prueba ambas responsabilidades (issue y workflow tracker)
+- `adws/test/lib/adw/actors/initialize_workflow_tracker_test.rb`: **Eliminado** (tests fusionados en `initialize_tracker_test.rb`)
 
 ### Cambios Clave
 
-- Se reemplazó una única línea de CSS en el archivo de estilos globales del frontend
-- El color seleccionado (`#FFFDE7`) es un amarillo muy sutil que mantiene excelente legibilidad y contraste
-- No se requirieron cambios en otros componentes ya que el nuevo color mantiene el contraste adecuado con texto oscuro (#333) y elementos blancos
-- El cambio es puramente visual y no afecta la lógica de la aplicación ni los tests funcionales
+1. **Color de Fondo Frontend**: Se eligió `#FEFDF8` en lugar del propuesto `#FFFDE7` - un amarillo extremadamente sutil con tintes crema que proporciona calidez sin sacrificar legibilidad
+
+2. **Unificación de Actors**: Se consolidaron dos actors separados (`InitializeIssueTracker` y `InitializeWorkflowTracker`) en uno solo (`InitializeTracker`) que:
+   - Carga o crea el issue tracker
+   - Actualiza el `branch_name` si se proporciona
+   - Crea un workflow tracker fresco para cada ejecución
+   - Reduce complejidad al tener un único punto de inicialización
+
+3. **Simplificación de Comentarios GitHub**: Los métodos `render_comment` ya no generan enlaces a comentarios GitHub, optando por referencias locales más simples (solo `adw_id` y tipo de workflow)
+
+4. **Inputs Opcionales**: El nuevo actor acepta `branch_name` y `workflow_type` como inputs opcionales, permitiendo mayor flexibilidad en diferentes contextos de workflow
+
+5. **Eliminación de Método Helper**: El método `comment_url` fue eliminado del módulo `Tracker` ya que ya no es necesario tras simplificar el rendering de comentarios
 
 ## Como Usar
 
-Esta funcionalidad no requiere acción del usuario. El cambio de color de fondo se aplica automáticamente al cargar la aplicación:
+### Cambio de Color (Usuario Final)
+1. Abrir la aplicación Todo List en el navegador
+2. El fondo será automáticamente amarillo clarito en lugar de gris
+3. No requiere ninguna acción adicional del usuario
 
-1. Iniciar el servidor de desarrollo: `cd frontend && npm run dev`
-2. Abrir la aplicación en el navegador: `http://localhost:5173`
-3. El fondo amarillo clarito se mostrará automáticamente en toda la página
+### Refactorización ADW (Desarrolladores)
+1. Los workflows existentes automáticamente usan el nuevo `InitializeTracker`
+2. Si estás creando un nuevo workflow, usa:
+   ```ruby
+   play Adw::Actors::InitializeTracker
+   ```
+   En lugar de:
+   ```ruby
+   play Adw::Actors::InitializeIssueTracker,
+        Adw::Actors::InitializeWorkflowTracker
+   ```
+3. Los inputs `branch_name` y `workflow_type` son opcionales y se propagan automáticamente desde `PipelineInputs`
 
 ## Configuracion
 
-No se requiere configuración adicional. El color está definido directamente en `frontend/src/index.css`.
+No se requiere configuración adicional. El cambio de color es estático en el CSS y la refactorización de trackers es transparente para usuarios finales.
 
 ### Alternativas de Color
 
 Si se desea ajustar la intensidad del amarillo, se pueden considerar estas alternativas:
 
-- `#FFFDE7` - Amarillo muy clarito (actual - Material Design Yellow 50)
+- `#FEFDF8` - Amarillo muy clarito con tintes crema (actual - color implementado)
+- `#FFFDE7` - Amarillo muy clarito (Material Design Yellow 50)
 - `#FFF9C4` - Amarillo claro con más saturación (Material Design Yellow 100)
 - `#FFF59D` - Amarillo con mayor intensidad (Material Design Yellow 200)
 - `#FFFACD` - Lemon Chiffon (color CSS estándar)
 
 ## Testing
 
-### Tests Automatizados
-
-Los tests existentes (unitarios y de integración) no se ven afectados por este cambio visual:
-
+### Frontend
 ```bash
-# Tests del backend
-cd backend && bin/rails test
-
-# Tests del frontend
 cd frontend && npm test
 ```
+Los tests no se ven afectados ya que son funcionales, no visuales.
 
-### Validación Visual Manual
+### Backend/ADW
+```bash
+cd backend && bin/rails test
+```
+Los tests del nuevo actor unificado verifican:
+- Creación correcta del issue tracker
+- Propagación del `branch_name`
+- Creación correcta del workflow tracker con `adw_id` y `workflow_type`
 
-Verificar los siguientes aspectos en el navegador:
-
-- El fondo de la página es amarillo clarito
-- El texto principal (#333) mantiene buena legibilidad sobre el fondo amarillo
-- Las tarjetas blancas (`.app`) contrastan correctamente con el fondo
-- Los botones y elementos interactivos mantienen su visibilidad
-- El contraste cumple con los estándares WCAG AA de accesibilidad
+### Validación Visual
+1. Ejecutar `cd frontend && npm run dev`
+2. Abrir `http://localhost:5173`
+3. Verificar:
+   - Fondo amarillo muy clarito
+   - Texto legible con buen contraste
+   - Tarjetas blancas distinguibles
 
 ## Notas
 
-- **Reversibilidad**: Este cambio es completamente reversible modificando una única línea en `frontend/src/index.css`
-- **Accesibilidad**: El color `#FFFDE7` mantiene un contraste adecuado con el texto oscuro (#333), cumpliendo con los estándares WCAG AA
-- **Compatibilidad**: No hay impacto en la funcionalidad de la aplicación, solo es un cambio estético
-- **Material Design**: Se utilizó la paleta Material Design Yellow 50 para consistencia con estándares de diseño modernos
+### Decisión de Color
+Se optó por `#FEFDF8` (amarillo muy clarito con tintes crema) en lugar del propuesto `#FFFDE7` (Material Design Yellow 50). Este color es aún más sutil y proporciona:
+- Excelente contraste WCAG AA con texto oscuro
+- Calidez visual sin saturación excesiva
+- Mejor armonía con componentes blancos
+
+### Arquitectura de Trackers
+La unificación de actors sigue el principio de **Single Responsibility Principle** a nivel de workflow phase:
+- **Antes**: Dos actors separados → dos pasos en el workflow
+- **Ahora**: Un actor unificado → un solo paso de inicialización
+- **Beneficio**: Menor complejidad, código más mantenible, menor superficie de error
+
+### Cambios de Nomenclatura
+- El archivo `initialize_issue_tracker.rb` fue **renombrado** a `initialize_tracker.rb` (no eliminado)
+- El contenido del antiguo `InitializeIssueTracker` fue **fusionado** con `InitializeWorkflowTracker`
+- Los tests correspondientes también fueron fusionados y expandidos
+
+### Retrocompatibilidad
+La refactorización mantiene la misma interfaz pública:
+- Los workflows existentes no requieren cambios en sus inputs
+- Los trackers generados tienen la misma estructura YAML
+- Los comentarios GitHub mantienen el mismo formato (solo eliminando enlaces innecesarios)
