@@ -22,3 +22,12 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando trabajes con cualquier cosa bajo frontend/
     - Cuando necesites saber como arrancar o testear la aplicacion React
     - Cuando trabajes con componentes, servicios o estilos del frontend
+
+- app_docs/feature-52-delete-confirmation-dialog.md
+  - Condiciones:
+    - Cuando trabajes con el componente ConfirmDialog o modales de confirmacion
+    - Cuando implementes confirmaciones antes de acciones destructivas (borrar, eliminar)
+    - Cuando necesites crear dialogos de confirmacion reutilizables
+    - Cuando modifiques el flujo de eliminacion de tareas en TaskItem
+    - Cuando resuelvas problemas relacionados con modales o overlays
+    - Cuando trabajes con estilos de modales (.modal-overlay, .modal, .modal-actions)
