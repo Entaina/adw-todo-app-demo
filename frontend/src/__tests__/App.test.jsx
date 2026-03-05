@@ -11,34 +11,22 @@ vi.mock('../services/api', () => ({
   reorderTasks: vi.fn().mockResolvedValue([])
 }))
 
-test('renders Todo List heading', async () => {
+test('renders Todo List heading', () => {
   render(<App />)
   const heading = screen.getByRole('heading', { name: /todo list/i })
   expect(heading).toBeInTheDocument()
-  // Wait for theme initialization to complete
-  await waitFor(() => {
-    expect(heading).toBeInTheDocument()
-  })
 })
 
-test('renders task form', async () => {
+test('renders task form', () => {
   render(<App />)
   const input = screen.getByPlaceholderText(/nueva tarea/i)
   expect(input).toBeInTheDocument()
-  // Wait for theme initialization to complete
-  await waitFor(() => {
-    expect(input).toBeInTheDocument()
-  })
 })
 
-test('renders task list', async () => {
+test('renders task list', () => {
   render(<App />)
   const text = screen.getByText(/no hay tareas/i)
   expect(text).toBeInTheDocument()
-  // Wait for theme initialization to complete
-  await waitFor(() => {
-    expect(text).toBeInTheDocument()
-  })
 })
 
 test('toggle calls updateTask with completed: true when task is not completed', async () => {

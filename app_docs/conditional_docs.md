@@ -33,3 +33,14 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando implementes nuevos componentes que necesiten adaptarse a ambos temas
     - Cuando trabajes con CSS Custom Properties (variables CSS)
     - Cuando debuggees problemas de persistencia de preferencias de tema
+
+- app_docs/feature-63b5f20d-theme-toggle.md
+  - Condiciones:
+    - Cuando trabajes con el sistema de temas (tema oscuro/claro)
+    - Cuando necesites añadir nuevos colores temáticos o CSS Custom Properties
+    - Cuando modifiques el hook useTheme o el componente ThemeToggle
+    - Cuando implementes nuevos componentes que necesiten soporte para temas
+    - Cuando resuelvas problemas relacionados con colores, contraste o accesibilidad en la UI
+    - Cuando trabajes con localStorage para persistir preferencias de usuario
+    - Cuando debuggees problemas de detección de preferencias del sistema operativo
+    - Cuando añadas tests relacionados con temas
