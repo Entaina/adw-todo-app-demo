@@ -30,3 +30,12 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando modifiques el comportamiento de eliminación de tareas
     - Cuando trabajes con el componente ConfirmDialog o TaskItem
     - Cuando necesites crear diálogos modales reutilizables
+
+- app_docs/feature-0fa408f3-confirm-delete-dialog.md
+  - Condiciones:
+    - Cuando trabajes con confirmaciones de acciones destructivas en la UI
+    - Cuando necesites implementar diálogos modales de confirmación
+    - Cuando modifiques el comportamiento de eliminación de tareas
+    - Cuando trabajes con el componente ConfirmDialog o TaskItem
+    - Cuando necesites crear diálogos modales reutilizables
+    - Cuando necesites entender el flujo de confirmación antes de eliminar

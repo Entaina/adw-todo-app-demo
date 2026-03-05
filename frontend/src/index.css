@@ -184,6 +184,12 @@ p {
   line-height: 1.6;
 }
 
+.confirm-dialog-warning {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
 .confirm-dialog-buttons {
   display: flex;
   justify-content: flex-end;

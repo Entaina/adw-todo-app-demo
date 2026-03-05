@@ -16,6 +16,7 @@ const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel }) => {
       <div className="confirm-dialog">
         <h3 className="confirm-dialog-title">{title}</h3>
         <p className="confirm-dialog-message">{message}</p>
+        <p className="confirm-dialog-warning">Esta acción no se puede deshacer.</p>
         <div className="confirm-dialog-buttons">
           <button className="btn btn-cancel" onClick={onCancel}>
             Cancelar

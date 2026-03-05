@@ -29,6 +29,7 @@ describe('ConfirmDialog', () => {
 
     expect(screen.getByText('Test Title')).toBeInTheDocument();
     expect(screen.getByText('Test message')).toBeInTheDocument();
+    expect(screen.getByText('Esta acción no se puede deshacer.')).toBeInTheDocument();
   });
 
   it('calls onCancel when cancel button is clicked', () => {
