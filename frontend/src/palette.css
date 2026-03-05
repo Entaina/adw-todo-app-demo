@@ -1,0 +1,27 @@
+:root {
+  /* Azules Pastel - Para primario y acentos */
+  --pastel-blue-100: #E3F2FD; /* fondo muy suave */
+  --pastel-blue-200: #BBDEFB; /* fondo suave */
+  --pastel-blue-300: #A8D5E5; /* primario pastel */
+  --pastel-blue-400: #7BC4DE; /* hover primario */
+  --pastel-blue-500: #5DADE2; /* acento focus */
+  --pastel-blue-700: #7B8D9E; /* títulos/headings */
+
+  /* Rojos Pastel - Para estados de peligro */
+  --pastel-red-300: #F5A9A3; /* danger pastel */
+  --pastel-red-400: #EB8C84; /* danger hover */
+
+  /* Verdes Pastel - Para superficies alternativas */
+  --pastel-green-100: #E8F5E9; /* fondo alternativo muy suave */
+  --pastel-green-200: #D4EDBC; /* superficie alternativa */
+
+  /* Neutros - Para fondos, bordes y textos */
+  --pastel-gray-50: #FAFAFA; /* fondo página */
+  --pastel-gray-100: #F5F5F5; /* superficie principal */
+  --pastel-gray-200: #E8E8E8; /* bordes */
+  --pastel-gray-300: #DEDEDE; /* bordes sutiles */
+  --pastel-gray-400: #BDBDBD; /* texto muted */
+  --pastel-gray-500: #9E9E9E; /* texto secundario */
+  --pastel-gray-600: #757575; /* texto principal */
+  --pastel-gray-white: #FFFFFF; /* superficie */
+}
