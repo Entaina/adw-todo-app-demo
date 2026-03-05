@@ -22,3 +22,10 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando trabajes con cualquier cosa bajo frontend/
     - Cuando necesites saber como arrancar o testear la aplicacion React
     - Cuando trabajes con componentes, servicios o estilos del frontend
+
+- app_docs/feature-fffcdc5b-confirm-delete-dialog.md
+  - Condiciones:
+    - Cuando trabajes con el componente ConfirmDialog o necesites implementar confirmaciones modales
+    - Cuando modifiques el flujo de eliminación de tareas
+    - Cuando necesites crear dialogs de confirmación reutilizables en React
+    - Cuando trabajes con modals, overlays o componentes de UI que requieran confirmación del usuario

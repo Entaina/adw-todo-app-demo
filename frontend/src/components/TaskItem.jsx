@@ -34,7 +34,7 @@ function TaskItem({ task, onToggle, onDelete }) {
         {task.title}
       </span>
       <button
-        onClick={() => onDelete(task.id)}
+        onClick={() => onDelete(task)}
         className="btn btn-delete"
       >
         Eliminar

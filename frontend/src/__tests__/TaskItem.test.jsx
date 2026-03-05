@@ -52,7 +52,7 @@ test('calls onDelete when delete button is clicked', () => {
   render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
 
   fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
-  expect(mockDelete).toHaveBeenCalledWith(1)
+  expect(mockDelete).toHaveBeenCalledWith(mockTask)
 })
 
 test('renders drag handle', () => {
