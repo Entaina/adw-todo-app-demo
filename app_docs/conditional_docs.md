@@ -30,3 +30,13 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando implementes nuevos componentes que requieran tematizacion
     - Cuando necesites entender el sistema de tokens de color (paleta vs semantica)
     - Cuando resuelvas problemas de accesibilidad o contraste de colores
+
+- app_docs/feature-6f57a176-ochre-color-palette.md
+  - Condiciones:
+    - Cuando trabajes con el sistema de colores ocres de la aplicación
+    - Cuando necesites entender la arquitectura de dos capas (paleta + semántica)
+    - Cuando implementes nuevos componentes y necesites usar variables CSS consistentes
+    - Cuando modifiques o extiendas la paleta de colores
+    - Cuando trabajes con el módulo ADW Tracker o actores de inicialización
+    - Cuando necesites entender la refactorización de Issue y Workflow trackers
+    - Cuando resuelvas problemas relacionados con InitializeTracker genérico
