@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
+import ThemeToggle from './components/ThemeToggle'
 import { fetchTasks, createTask, updateTask, deleteTask, reorderTasks } from './services/api'
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
 
   return (
     <div className="app">
+      <ThemeToggle />
       <h1>Todo List</h1>
       <TaskForm onTaskCreated={handleCreateTask} />
       <TaskList

@@ -22,3 +22,14 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando trabajes con cualquier cosa bajo frontend/
     - Cuando necesites saber como arrancar o testear la aplicacion React
     - Cuando trabajes con componentes, servicios o estilos del frontend
+
+- app_docs/feature-6da858a8-theme-toggle.md
+  - Condiciones:
+    - Cuando trabajes con el sistema de temas (tema oscuro/claro)
+    - Cuando necesites añadir nuevos colores o variables CSS temáticas
+    - Cuando modifiques o extiendas el hook useTheme
+    - Cuando trabajes con el componente ThemeToggle
+    - Cuando resuelvas problemas de colores o contraste en la UI
+    - Cuando implementes nuevos componentes que necesiten adaptarse a ambos temas
+    - Cuando trabajes con CSS Custom Properties (variables CSS)
+    - Cuando debuggees problemas de persistencia de preferencias de tema
