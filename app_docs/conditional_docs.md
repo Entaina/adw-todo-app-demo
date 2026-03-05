@@ -22,3 +22,11 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando trabajes con cualquier cosa bajo frontend/
     - Cuando necesites saber como arrancar o testear la aplicacion React
     - Cuando trabajes con componentes, servicios o estilos del frontend
+
+- app_docs/feature-3211dace-confirm-delete-dialog.md
+  - Condiciones:
+    - Cuando trabajes con confirmaciones de acciones destructivas en la UI
+    - Cuando necesites implementar diálogos modales de confirmación
+    - Cuando modifiques el comportamiento de eliminación de tareas
+    - Cuando trabajes con el componente ConfirmDialog o TaskItem
+    - Cuando necesites crear diálogos modales reutilizables

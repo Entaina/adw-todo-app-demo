@@ -51,8 +51,30 @@ test('calls onDelete when delete button is clicked', () => {
   const mockDelete = vi.fn()
   render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
 
-  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+  // Click the delete button to open the modal
+  const deleteButton = document.querySelector('.btn-delete')
+  fireEvent.click(deleteButton)
+
+  // Click the confirm button in the modal
+  const confirmButton = document.querySelector('.btn-danger')
+  fireEvent.click(confirmButton)
+
   expect(mockDelete).toHaveBeenCalledWith(1)
+})
+
+test('does not call onDelete when cancel is clicked in confirm dialog', () => {
+  const mockDelete = vi.fn()
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
+
+  // Click the delete button to open the modal
+  const deleteButton = document.querySelector('.btn-delete')
+  fireEvent.click(deleteButton)
+
+  // Click the cancel button in the modal
+  const cancelButton = document.querySelector('.btn-cancel')
+  fireEvent.click(cancelButton)
+
+  expect(mockDelete).not.toHaveBeenCalled()
 })
 
 test('renders drag handle', () => {
