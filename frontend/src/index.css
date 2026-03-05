@@ -53,7 +53,7 @@ p {
 
 .task-input:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: #7FFF00;
 }
 
 /* Buttons */
@@ -67,12 +67,12 @@ p {
 }
 
 .btn-primary {
-  background-color: #3498db;
-  color: white;
+  background-color: #7FFF00;
+  color: #333;
 }
 
 .btn-primary:hover {
-  background-color: #2980b9;
+  background-color: #6BE600;
 }
 
 .btn-delete {
