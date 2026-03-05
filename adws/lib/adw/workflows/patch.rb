@@ -74,8 +74,10 @@ module Adw
         patch_adw_id = Adw::Utils.make_adw_id
         patch_logger = Adw::Utils.setup_logger(issue_number, patch_adw_id, "adw_patch")
 
-        # Transition parent workflow tracker to "patching"
-        Adw::Tracker.update(setup.tracker, issue_number, "patching", logger)
+        # Transition parent workflow tracker to "patching" (skip if not found)
+        if tracker[:adw_id]
+          Adw::Tracker.update(tracker, issue_number, "patching", logger)
+        end
 
         # Phase 2: Execute patch pipeline with swapped context
         pipeline = Pipeline.result(
