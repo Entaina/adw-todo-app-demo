@@ -28,3 +28,9 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando se trabaje con estilos globales de la aplicacion
     - Cuando se modifique el color de fondo o esquema de colores
     - Cuando se actualice frontend/src/index.css
+
+- app_docs/feature-2d92651f-background-color.md
+  - Condiciones:
+    - Cuando se trabaje con estilos visuales globales del body
+    - Cuando se modifique el color de fondo de la aplicacion
+    - Cuando se actualice frontend/src/index.css con cambios de tema o color
