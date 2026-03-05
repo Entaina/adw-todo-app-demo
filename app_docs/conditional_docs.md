@@ -22,3 +22,11 @@ Este documento te ayuda a determinar que documentacion deberias leer en funcion 
     - Cuando trabajes con cualquier cosa bajo frontend/
     - Cuando necesites saber como arrancar o testear la aplicacion React
     - Cuando trabajes con componentes, servicios o estilos del frontend
+
+- app_docs/feature-cfe1475e-ochre-color-palette.md
+  - Condiciones:
+    - Cuando trabajes con estilos CSS o variables de color
+    - Cuando necesites añadir o modificar colores en la aplicacion
+    - Cuando implementes nuevos componentes que requieran tematizacion
+    - Cuando necesites entender el sistema de tokens de color (paleta vs semantica)
+    - Cuando resuelvas problemas de accesibilidad o contraste de colores
