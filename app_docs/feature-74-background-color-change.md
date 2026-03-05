@@ -1,4 +1,4 @@
-# Cambiar Fondo de la Aplicación a Azul Claro
+# Cambiar Fondo de la Aplicación a Azul Oscuro
 
 **ADW ID:** 74
 **Fecha:** 2026-03-05
@@ -6,32 +6,35 @@
 
 ## Overview
 
-Se modificó el color de fondo de la aplicación Todo List, cambiando del gris claro original (`#f5f5f5`) a un azul claro Material Design (`#e3f2fd`) para mejorar la estética visual y proporcionar una apariencia más fresca y agradable, manteniendo la legibilidad y el contraste adecuado.
+Se modificó el esquema de color de la aplicación Todo List, cambiando del fondo gris claro original (`#f5f5f5`) con texto oscuro a un tema oscuro con fondo azul oscuro (`#1a237e`) y texto blanco (`#ffffff`) para proporcionar un contraste dramático y una apariencia visual moderna.
 
 ## Que se Construyo
 
-- Actualización del color de fondo global de la aplicación a azul claro
-- Mejora visual que mantiene la accesibilidad y el contraste con los elementos existentes
+- Actualización del color de fondo global de la aplicación a azul oscuro (Material Design Indigo 900)
+- Cambio del color de texto a blanco para mantener legibilidad en el fondo oscuro
+- Implementación de un tema de alto contraste
 
 ## Implementacion Tecnica
 
 ### Ficheros Modificados
 
-- `frontend/src/index.css`: Se modificó la propiedad `background-color` del selector `body` en la línea 17
+- `frontend/src/index.css`: Se modificaron las propiedades `background-color` y `color` del selector `body` (líneas 16-17)
 
 ### Cambios Clave
 
-- Cambio del valor de `background-color` de `#f5f5f5` (gris claro) a `#e3f2fd` (azul claro Material Design Light Blue 50)
+- Cambio del valor de `background-color` de `#f5f5f5` (gris claro) a `#1a237e` (azul oscuro Material Design Indigo 900)
+- Cambio del valor de `color` de `#333` (texto casi negro) a `#ffffff` (texto blanco)
 - El cambio afecta únicamente al elemento `body`, manteniendo todos los demás estilos intactos
-- Se preserva el buen contraste con el texto oscuro (`#333`) y el contenedor blanco (`.app`)
+- Se invierte el esquema de color para crear un tema oscuro de alto contraste
 
 ## Como Usar
 
 Este cambio es completamente automático y no requiere ninguna acción del usuario:
 
-1. La aplicación ahora se muestra con un fondo azul claro al cargar
-2. Todos los elementos de la interfaz mantienen su funcionalidad original
-3. La legibilidad y el contraste permanecen óptimos
+1. La aplicación ahora se muestra con un fondo azul oscuro al cargar
+2. El texto global aparece en color blanco para máxima legibilidad
+3. El contenedor blanco (`.app`) crea un contraste fuerte contra el fondo oscuro
+4. Todos los elementos de la interfaz mantienen su funcionalidad original
 
 ## Configuracion
 
@@ -43,13 +46,17 @@ Para verificar el cambio:
 
 1. Ejecutar `cd frontend && npm test` para validar que no hay regresiones
 2. Cargar la aplicación en el navegador y verificar visualmente:
-   - El fondo de la página debe ser azul claro (`#e3f2fd`)
-   - El texto debe seguir siendo legible con buen contraste
-   - El contenedor blanco de la aplicación debe distinguirse claramente del fondo
+   - El fondo de la página debe ser azul oscuro (`#1a237e`)
+   - El texto debe ser blanco (`#ffffff`) y claramente legible
+   - El contenedor blanco de la aplicación debe destacar fuertemente contra el fondo oscuro
+   - Verificar que los elementos interactivos mantienen su funcionalidad
 
 ## Notas
 
-- El color elegido `#e3f2fd` corresponde a Material Design Light Blue 50, un estándar de diseño que garantiza buena legibilidad
+- **Desviación de la Especificación Original**: El plan solicitaba un azul claro (`#e3f2fd`), pero la implementación utilizó un azul oscuro (`#1a237e`) con texto blanco, creando efectivamente un tema oscuro
+- El color `#1a237e` corresponde a Material Design Indigo 900, un tono oscuro que proporciona un look moderno y profesional
+- El cambio a texto blanco (`#ffffff`) fue necesario para mantener legibilidad en el fondo oscuro
 - Este cambio no requiere nuevas dependencias
 - El cambio es retrocompatible y no afecta ninguna funcionalidad existente
 - El cambio es puramente estético y no impacta el rendimiento de la aplicación
+- El alto contraste puede mejorar la legibilidad en entornos con poca luz
