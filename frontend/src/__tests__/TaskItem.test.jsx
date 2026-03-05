@@ -47,12 +47,56 @@ test('calls onToggle when checkbox is clicked', () => {
   expect(mockToggle).toHaveBeenCalledWith(1)
 })
 
-test('calls onDelete when delete button is clicked', () => {
+test('shows confirmation dialog when delete button is clicked', () => {
   const mockDelete = vi.fn()
   render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
 
   fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+
+  // Dialog should be shown
+  expect(screen.getByText('Confirmar eliminación')).toBeInTheDocument()
+  expect(screen.queryByText(/¿Estás seguro de que quieres eliminar la tarea/i)).toBeInTheDocument()
+
+  // onDelete should not be called yet
+  expect(mockDelete).not.toHaveBeenCalled()
+})
+
+test('calls onDelete when user confirms deletion', () => {
+  const mockDelete = vi.fn()
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
+
+  // Click delete button
+  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+
+  // Confirm deletion
+  const confirmButtons = screen.getAllByRole('button', { name: /eliminar/i })
+  const confirmButton = confirmButtons.find(btn => btn.classList.contains('btn-confirm-danger'))
+  fireEvent.click(confirmButton)
+
   expect(mockDelete).toHaveBeenCalledWith(1)
+})
+
+test('does not call onDelete when user cancels deletion', () => {
+  const mockDelete = vi.fn()
+  render(<TaskItem task={mockTask} onToggle={() => {}} onDelete={mockDelete} />)
+
+  // Click delete button
+  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+
+  // Cancel deletion
+  fireEvent.click(screen.getByRole('button', { name: /cancelar/i }))
+
+  expect(mockDelete).not.toHaveBeenCalled()
+  expect(screen.queryByText('Confirmar eliminación')).not.toBeInTheDocument()
+})
+
+test('dialog shows task title in the message', () => {
+  const taskWithTitle = { ...mockTask, title: 'Comprar leche' }
+  render(<TaskItem task={taskWithTitle} onToggle={() => {}} onDelete={() => {}} />)
+
+  fireEvent.click(screen.getByRole('button', { name: /eliminar/i }))
+
+  expect(screen.getByText(/¿Estás seguro de que quieres eliminar la tarea "Comprar leche"\?/)).toBeInTheDocument()
 })
 
 test('renders drag handle', () => {
