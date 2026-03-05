@@ -1,6 +1,6 @@
 # Diálogo de Confirmación al Borrar Tarea
 
-**ADW ID:** 6fa443b8
+**ADW ID:** 65fabbc3
 **Fecha:** 2026-03-05
 **Especificación:** /Users/elafo/workspace/entaina/aurgi-curso-desarrolladores-sample-app/trees/issue-52/.issues/52/plan.md
 
